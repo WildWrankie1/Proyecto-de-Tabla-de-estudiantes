@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de estudiantes</title>
+    
+    <style>
+
+    body { 
+        background-color: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+
+    .container { 
+        overflow: auto;
+    }
+
+    #header {
+        background-color: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        text-align: center;
+        color: #000;
+        font-size: 20px;
+        text-shadow: 0 0 10px #f5f5f5;
+        padding: 10px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 2px solid #f5f5f5;
+        box-shadow: 0 0 10px rgba(197, 24, 24, 0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        border-radius: 10px;
+        gap: 10px;
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s;
+    }
+    
+
+
+    #header a {
+        text-decoration: none;
+        color: #fff;
+    }
+
+    
+    
+
+
+    </style>
+
+</head>
+<body>
+
+    <div id="header">
+        <a href=""><img src="../imagenes/logo.webp" alt="Logo Académica Colón" width="150px"></a>
+        <a href="">Inicio</a>
+        <a href="">Portales</a>
+        <a href="">Gestionar cursos</a>
+        <a href="">Aula Virtual</a>
+        <a href="">☢️</a>
+    </div>
+
+
+
+<h1>Datos del curso (25/2846)</h1>
+
+    <div class="container"> 
+
+        
+
+        <form action="index.html" method="post">
+                
+        <table> 
+            <thead>
+                <tr>
+                    <th scope="col">ID Guía
+                        <input type="text" id="idguia" name="idguia" placeholder="ID Guía">
+                    </th>
+
+                    <th scope="col">Nombre de Curso
+                        <input type="text" id="nombre" name="nombre" placeholder="Nombre de Curso">
+                    </th>
+
+                    <th scope="col">Fecha Inicio
+                        <input type="date" id="fecha" name="fecha" placeholder="Fecha Inicio">
+                    </th>
+
+                    <th scope="col">Fecha Fin
+                        <input type="date" id="fecha" name="fecha" placeholder="Fecha Fin">
+                    </th>
+
+                    <th scope="col">Horas de Duración
+                        <input type="number" id="horas" name="horas" placeholder="Horas de Duración">
+                    </th>
+
+                    <th scope="col">Horario de Tutoría
+                        <input type="text" id="horario" name="horario" placeholder="Horario de Tutoría">
+                    </th>
+
+                    <th scope="col">Dinamizador
+                        <input type="text" id="dinamizador" name="dinamizador" placeholder="Dinamizador">
+                    </th>
+
+                    <th scope="col">25% de Matriculación
+                        <input type="date" id="matriculacion" name="matriculacion" placeholder="25% de Matriculación">
+                    </th>
+
+                    <th scope="col">25% de Conexión
+                        <input type="date" id="conexion" name="conexion" placeholder="25% de Conexión">
+                    </th>
+
+                    <th scope="col">Fecha 50%
+                        <input type="date" id="50" name="50" placeholder="Fecha 50%">
+                    </th>
+
+                    <th scope="col">Fecha 75%
+                        <input type="date" id="75" name="75" placeholder="Fecha 75%">
+                    </th>
+
+                    <th scope="col">Nº de Exámenes
+                        <input type="number" id="exmenes" name="exmenes" placeholder="Nº de Exámenes">
+                    </th>
+
+                    <th scope="col">75% - 100% 
+                        <input type="number" id="75100" name="75100" placeholder="75% - 100%">
+                    </th>
+
+                    <th scope="col">50%
+                        <input type="number" id="50" name="50" placeholder="50%">
+                    </th>
+
+                    <th scope="col">25%
+                        <input type="number" id="25" name="25" placeholder="25%">
+                    </th>
+
+                    <th scope="col">menos del 25%
+                        <input type="number" id="menos" name="menos" placeholder="menos del 25%">
+                    </th>
+
+                    <th scope="col">Max. Alumnos Subcencionables
+                        <input type="number" id="maxsub" name="maxsub" placeholder="Max. Alumnos Subcencionables">
+                    </th>
+
+                    <th scope="col">15% Desvío
+                        <input type="number" id="desv" name="desv" placeholder="15% Desvío">
+                    </th>
+
+                    <th scope="col">Alumnos Subvencionables
+                        <input type="number" id="subven" name="subven" placeholder="Alumnos Subvencionables">
+                    </th>
+
+                    <th scope="col">Total Alumnos
+                        <input type="number" id="total" name="total" placeholder="Total Alumnos">
+                    </th>
+
+                    <th scope="col">Evaluación Referencia
+                        <input type="number" id="referencia" name="referencia" placeholder="Evaluación Referencia">
+                    </th>
+
+                    <th scope="col">Alumnos Avanzados
+                        <input type="number" id="avanzados" name="avanzados" placeholder="Alumnos Avanzados">
+                    </th>
+
+                    <th scope="col">Alumnos Rezagados
+                        <input type="number" id="rezagados" name="rezagados" placeholder="Alumnos Rezagados">
+                    </th>
+
+                    
+                
+                </thead>
+            </table>
+        </div>
+</form>
+
+
+
+<form action="index.html" method="post">
+    <table>
+        <tr>
+            <td>Ultima Actualización</td>
+            <td><input type="datetime-local" name="ultimaactualizacion" id="ultimaactualizacion"></td>
+
+        <td>
+            <input type="button" value="Ver en Moodle" onclick="window.location.href='https://xxxx'">
+        </td>
+
+        <td>
+            <input type="button" value="Descargar Excel📋" onclick="window.location.href='https://xxxx'">
+        </td>
+
+        <td>
+            <input type="button" value="Ver Calendario🗓️" onclick="window.location.href='https://xxxx'">
+        </td>
+
+        <td>
+            <input type="button" value="Editar Caledario✏️" onclick="window.location.href='https://xxxx'">
+        </td>
+
+        <td>
+            <input type="button" value="Actualizar Informe🔄️" onclick="window.location.href='https://xxxx'">
+        </td>
+            
+    </table>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+<!--
+    <div>
+        <h1>Tabla de seguimiento</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    <th scope="col">DNI</th>
+                    <th scope="col">Telefono</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Situacion Laboral</th>
+                    <th scope="col">1ra Conexión</th>
+                    <th scope="col">Última conexión</th>
+                    <th scope="col">Conesxión Total</th>
+                    <th scope="col">Prueba de competencia 1 (Cuestionario)</th>
+                    <th scope="col">Prueba de competencia 2 (Subida de archivo)</th>
+                    <th scope="col">Prueba de competencia 3 (Correo)</th>
+                    <th scope="col">Prueba de competencia 4 (Foro)</th>
+                    <th scope="col">Observaciones Responsable</th>
+                    <th scope="col">Observaciones Tutor</th>
+                    <th scope="col">Evaluaciones realizadas</th>
+                    <th scope="col">Contenidos</th>
+                    <th scope="col">Nota Final</th>
+                    <th scope="col">Tipo Alumno</th>
+                </tr>
+
+                <thead></thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>Juan</td>
+                        <td>Perez</td>
+                        <td>19/05/1990</td>
+                        <td>+34 987 654 321</td>
+                        <td>juan.perez@gmail.com</td>
+                        <td>Estudiante</td>
+                        <td>2021-05-01</td>
+                        <td>2021-05-02</td>
+                        <td>3</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+
+-->
+
