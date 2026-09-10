@@ -1,61 +1,124 @@
 body { 
-        background-color: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    }
+    background-color: #f5f5f5; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
 
-    .container { 
-        overflow: auto;
-    }
+.caja1 { 
+    overflow: auto;
+    padding: 0 20px;
+}
 
-    #header {
-        background-color: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        text-align: center;
-        color: #000;
-        font-size: 20px;
-        text-shadow: 0 0 10px #f5f5f5;
-        padding: 10px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        border: 2px solid #f5f5f5;
-        box-shadow: 0 0 10px rgba(197, 24, 24, 0.2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: row;
-        border-radius: 10px;
-        gap: 10px;
-        position: sticky;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 100;
-        background-color: rgba(0, 0, 0, 0.5);
-        font-weight: bold;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s;
-    }
-    
+#header {
+    background-color: rgba(0, 0, 0, 0.5); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    text-align: center;
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #f5f5f5;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #f5f5f5;
+    box-shadow: 0 0 10px rgba(197, 24, 24, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    border-radius: 10px;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
 
+a {
+    text-decoration: none;
+}
 
-    #header a {
-        text-decoration: none;
-        color: #fff;
-    }
+table a {
+    color: #003cff;
+}
 
-    table {
-        
-        width: 100%;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        border: 2px solid #070707;
-        
-    }
+table {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+}
 
-    td {
-        padding: 5px;
-        border: 1px solid #070707;
-        text-align: center;
-        font-size: 15px;
+td {
+    padding: 5px;
+    border: 1px solid #d8d8d8;
+    text-align: center;
+    font-size: 15px;
+    background-color: #ffffff;
+}
 
+/* Estilos de encabezados e indicadores */
+.constante1 {
+    background-color: #3c6e9c;
+    color: #f5f5f5;
+    font-weight: bold;
+}
 
-    }
-    
+.variable1 {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+#avanzados {
+    background-color: #79be4b;
+    font-weight: bold;
+}
+
+#rezagados {
+    background-color: #ff6363;
+    font-weight: bold;
+}
+
+#cantexam {
+    background-color: #ff4ea6;
+}
+
+#nalumnos {
+    font-weight: bold;
+}
+
+#totalalumnos {
+    background-color: #cde1ff;
+    font-weight: bold;    
+}
+
+#c75100 {
+    background-color: #98caab;
+    font-weight: bold;
+}
+
+#c50 {
+    background-color: #ffd597;
+    font-weight: bold;
+}
+
+#c25 {
+    background-color: #f8f669;
+    font-weight: bold;
+}
+
+#cm25 {
+    background-color: #fdd3d3;
+    font-weight: bold;
+}
+
+.sinborde {
+    border: none !important;
+    background-color: transparent !important;
+    background: transparent !important;
+}
