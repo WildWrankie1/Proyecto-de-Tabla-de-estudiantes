@@ -27,7 +27,7 @@ body {
     border: none;
     box-shadow: 0 0 10px rgba(197, 24, 24, 0.2);
     display: flex;
-    justify-content: center; /* Centra los enlaces */
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
@@ -48,8 +48,6 @@ body {
     align-items: center;
 }
 
-
-
 a {
     text-decoration: none;
 }
@@ -59,8 +57,6 @@ table a {
 }
 
 table {
-
-
     margin-top: 10px;
     margin-bottom: 10px;
     border-collapse: collapse;
@@ -72,6 +68,22 @@ td {
     text-align: center;
     font-size: 15px;
     background-color: #ffffff;
+}
+
+/* Estilo para los campos dentro del formulario para integrarse perfectamente */
+table input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+table input:focus {
+    background-color: #f0f7ff;
 }
 
 /* Estilos de encabezados e indicadores */
@@ -133,4 +145,10 @@ td {
     border: none !important;
     background-color: transparent !important;
     background: transparent !important;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
