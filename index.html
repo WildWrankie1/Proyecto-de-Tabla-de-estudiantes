@@ -118,5 +118,85 @@
         </table>
     </div>
 
+<div><h1><small>Formulario</small></h1>
+<div>
+        <form action="index.html" method="post">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="constante1">ID Guía</td>
+                        <td class="variable1"><input type="text" name="idguia" placeholder="ID Guía"></td>
+                        <td class="constante1">Nombre de Curso</td>
+                        <td class="variable1"><input type="text" name="nombre" placeholder="Nombre del curso"></td>
+                        <td class="constante1">Nº de Exámenes</td>
+                        <td class="variable1" id="cantexam"><input type="number" name="examenes" placeholder="Total"></td>
+                        <td class="constante1" id="nalumnos">Nº de Alumnos</td>
+                        <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
+                        <td class="variable1"><input type="number" name="maxsub" placeholder="Máx. Subv."></td>
+                        <td class="constante1">Evaluación referencia<br> a 09-09-26</td>
+                        <td class="variable1"><input type="number" name="referencia" placeholder="Ref."></td>
+                    </tr>
+
+                    <tr>
+                        <td class="constante1">Fecha Inicio</td>
+                        <td class="variable1"><input type="date" name="fechainicio"></td>
+                        <td class="constante1">Tutor</td>
+                        <td class="variable1"><input type="text" name="tutor" placeholder="Tutor"></td>
+                        <td class="variable1"><input type="number" name="exam_75100" placeholder="Exámen"></td>
+                        <td id="c75100" class="variable1">75% - 100%</td>
+                        <td class="variable1"><input type="number" name="alumnos_75100" placeholder="Alumnos"></td>
+                        <td class="constante1">15% Desvío</td>
+                        <td class="variable1"><input type="number" name="desvio" placeholder="Desvío"></td>
+                        <td id="avanzados">Alumnos avanzados</td>
+                        <td class="variable1"><input type="number" name="avanzados" placeholder="Alumnos"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="constante1">Fecha Fin</td>
+                        <td class="variable1"><input type="date" name="fechafin"></td>
+                        <td class="constante1">Horario Tutoría</td>
+                        <td class="variable1"><input type="time" name="tutoria"></td>
+                        <td class="variable1"><input type="number" name="exam_50" placeholder="Exámen"></td>
+                        <td id="c50" class="variable1">50%</td>
+                        <td class="variable1"><input type="number" name="alumnos_50" placeholder="Alumnos"></td>
+                        <td class="constante1">Alumnos subvencionables</td>
+                        <td class="variable1"><input type="number" name="subvencionables" placeholder="Subv."></td>
+                        <td id="rezagados">Alumnos rezagados</td>
+                        <td class="variable1"><input type="number" name="rezagados" placeholder="Rezag."></td>
+                    </tr>
+
+                    <tr>
+                        <td class="constante1">Horas</td>
+                        <td class="variable1"><input type="number" name="horas" placeholder="Horas"></td>
+                        <td class="constante1">Dinamizador</td>
+                        <td class="variable1"><input type="text" name="dinamizador" placeholder="Dinamizador"></td>
+                        <td class="variable1"><input type="number" name="exam_25" placeholder="Exámen"></td>
+                        <td id="c25" class="variable1">25%</td>
+                        <td class="variable1"><input type="number" name="alumnos_25" placeholder="Alumnos"></td>
+                        <td class="variable1" id="totalalumnos" rowspan="2">Total alumnos</td>
+                        <td class="variable1" rowspan="2"><input type="number" name="total" placeholder="Total"></td>
+                        <td class="sinborde" colspan="2" rowspan="2"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="constante1">25% de matriculación</td>
+                        <td class="variable1"><input type="date" name="matriculacion"></td>
+                        <td class="constante1">25% de conexión</td>
+                        <td class="variable1"><input type="date" name="conexion"></td>
+                        <td class="variable1"><input type="number" name="exam_m25" placeholder="Exámen"></td>
+                        <td id="cm25" class="variable1">Menos del 25%</td>
+                        <td class="variable1"><input type="number" name="alumnos_m25" placeholder="Alumnos"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="text-align: right; margin-top: 10px;">
+                <button type="submit" style="padding: 8px 16px; background-color: #3c6e9c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Guardar Cambios</button>
+            </div>
+    
+        </form>
+        </div>
+</div>
+
 </body>
 </html>
