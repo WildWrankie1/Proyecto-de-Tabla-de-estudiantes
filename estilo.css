@@ -5,13 +5,20 @@ body {
     padding: 0;
 }
 
-.caja1 { 
-    overflow: auto;
-    padding: 0 20px;
+/* Contenedor principal centrado */
+.contenedor-principal { 
     width: fit-content;
-    max-width: 100%;
+    max-width: 95%;
     margin: 0 auto;
+    padding: 0 20px;
     box-sizing: border-box;
+}
+
+/* Cada cuadro tiene su propio scroll horizontal independiente */
+.caja-scroll {
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 15px;
 }
 
 #header {
@@ -57,22 +64,35 @@ table a {
 }
 
 table {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
     border-collapse: collapse;
 }
 
 td {
-    padding: 5px;
+    padding: 6px 10px;
     border: 1px solid #d8d8d8;
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     background-color: #ffffff;
 }
 
-/* Estilo para los campos dentro del formulario para integrarse perfectamente */
+.constante1, #avanzados, #rezagados, #nalumnos, #totalalumnos {
+    white-space: nowrap;
+    padding: 6px 12px;
+}
+
+.variable1 {
+    background-color: #ffffff;
+    color: #000000;
+    min-width: 90px;
+    box-sizing: border-box;
+}
+
 table input {
     width: 100%;
+    min-width: 75px;
     border: none;
     outline: none;
     background: transparent;
@@ -86,16 +106,10 @@ table input:focus {
     background-color: #f0f7ff;
 }
 
-/* Estilos de encabezados e indicadores */
 .constante1 {
     background-color: #3c6e9c;
     color: #f5f5f5;
     font-weight: bold;
-}
-
-.variable1 {
-    background-color: #ffffff;
-    color: #000000;
 }
 
 #avanzados {
@@ -148,7 +162,23 @@ table input:focus {
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.contenedor-boton {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+#botonguardar {
+    padding: 8px 16px;
+    background-color: #3c6e9c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
 }
