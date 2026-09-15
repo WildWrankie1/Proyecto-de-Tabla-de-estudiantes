@@ -14,7 +14,7 @@
         <a href="" target="_blank">Portales</a>
         <a href="" target="_blank">Gestionar cursos</a>
         <a href="" target="_blank">Aula Virtual</a>
-        <a href="login.html">📤</a>
+        <a href="" target="_blank">📤</a>
     </div>
 
     <h1>Datos del curso (25/2846)</h1>
@@ -25,75 +25,74 @@
             <table>
                 <tbody>
                     <tr>
-
                         <td class="constante1">ID Guía</td>
-                        <td class="variable1"><a href="#" target="_blank"></a></td>
+                        <td class="variable1"><a href="#" target="_blank" data-campo="idguia"></a></td>
                         <td class="constante1">Nombre de Curso</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="nombre"></td>
                         <td class="constante1">Nº de Exámenes</td>
-                        <td class="variable1" id="cantexam"></td>
+                        <td class="variable1" id="cantexam" data-campo="examenes"></td>
                         <td class="constante1" id="nalumnos">Nº de Alumnos</td>
                         <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="maxsub"></td>
                         <td class="constante1">Evaluación referencia a 09-09-26</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="referencia"></td>
                     </tr>
 
                     <tr>
                         <td class="constante1">Fecha Inicio</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="fechainicio"></td>
                         <td class="constante1">Tutor</td>
-                        <td class="variable1"></td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="tutor"></td>
+                        <td class="variable1" data-campo="exam_75100"></td>
                         <td id="c75100" class="variable1">75% - 100%</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="alumnos_75100"></td>
                         <td class="constante1">15% Desvío</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="desvio"></td>
                         <td id="avanzados">Alumnos avanzados</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="avanzados"></td>
                     </tr>
 
                     <tr>
                         <td class="constante1">Fecha Fin</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="fechafin"></td>
                         <td class="constante1">Horario Tutoría</td>
-                        <td class="variable1"></td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="tutoria"></td>
+                        <td class="variable1" data-campo="exam_50"></td>
                         <td id="c50" class="variable1">50%</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="alumnos_50"></td>
                         <td class="constante1">Alumnos subvencionables</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="subvencionables"></td>
                         <td id="rezagados">Alumnos rezagados</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="rezagados"></td>
                     </tr>
 
                     <tr>
                         <td class="constante1">Horas</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="horas"></td>
                         <td class="constante1">Dinamizador</td>
-                        <td class="variable1"></td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="dinamizador"></td>
+                        <td class="variable1" data-campo="exam_25"></td>
                         <td id="c25" class="variable1">25%</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="alumnos_25"></td>
                         <td class="variable1" id="totalalumnos" rowspan="2">Total alumnos</td>
-                        <td class="variable1" rowspan="2"></td>
+                        <td class="variable1" rowspan="2" data-campo="total"></td>
                         <td class="sinborde" colspan="2" rowspan="2"></td>
                     </tr>
 
                     <tr>
                         <td class="constante1">25% de matriculación</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="matriculacion"></td>
                         <td class="constante1">25% de conexión</td>
-                        <td class="variable1"></td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="conexion"></td>
+                        <td class="variable1" data-campo="exam_m25"></td>
                         <td id="cm25" class="variable1">Menos del 25%</td>
-                        <td class="variable1"></td>
+                        <td class="variable1" data-campo="alumnos_m25"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Cuadro 2: Tabla de Fechas Secundarias -->
+        <!-- Cuadro 2 y Cuadro 3 se mantienen iguales -->
         <div class="caja-scroll">
             <table>
                 <tbody>
@@ -107,7 +106,6 @@
             </table>
         </div>
 
-        <!-- Cuadro 3: Tabla de Acciones e Informes -->
         <div class="caja-scroll">
             <table>
                 <tbody>
@@ -124,94 +122,91 @@
             </table>
         </div>
 
-        <h1>Formulario</h1>
+        <h1><small>Formulario</small></h1>
 
-        <!-- Cuadro 4: Formulario -->
+        <!-- Formulario (Con data-campo y aria-label) -->
         <div class="caja-scroll">
-            <form action="index.html" method="post">
+            <form action="index.html" method="post" id="form-edicion">
                 <table>
                     <tbody>
                         <tr>
                             <td class="constante1">ID Guía</td>
-                            <td class="variable1"><input type="text" name="idguia" placeholder="ID Guía"></td>
+                            <td class="variable1"><input type="text" data-campo="idguia" aria-label="ID Guía" placeholder="ID Guía"></td>
                             <td class="constante1">Nombre de Curso</td>
-                            <td class="variable1"><input type="text" name="nombre" placeholder="Nombre del curso"></td>
+                            <td class="variable1"><input type="text" data-campo="nombre" aria-label="Nombre del curso" placeholder="Nombre del curso"></td>
                             <td class="constante1">Nº de Exámenes</td>
-                            <td class="variable1" id="cantexam"><input type="number" name="examenes" placeholder="Total"></td>
-                            <td class="constante1" id="nalumnos">Nº de Alumnos</td>
+                            <td class="variable1"><input type="number" data-campo="examenes" aria-label="Nº de Exámenes Total" placeholder="Total" min="0"></td>
+                            <td class="constante1">Nº de Alumnos</td>
                             <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
-                            <td class="variable1"><input type="number" name="maxsub" placeholder="Máx. Subv."></td>
+                            <td class="variable1"><input type="number" data-campo="maxsub" aria-label="Máximo alumnos subvencionables" placeholder="Máx. Subv." min="0"></td>
                             <td class="constante1">Evaluación referencia<br> a 09-09-26</td>
-                            <td class="variable1"><input type="number" name="referencia" placeholder="Ref."></td>
+                            <td class="variable1"><input type="number" data-campo="referencia" aria-label="Evaluación de referencia" placeholder="Ref." min="0"></td>
                         </tr>
 
                         <tr>
                             <td class="constante1">Fecha Inicio</td>
-                            <td class="variable1"><input type="date" name="fechainicio"></td>
+                            <td class="variable1"><input type="date" data-campo="fechainicio" aria-label="Fecha de Inicio"></td>
                             <td class="constante1">Tutor</td>
-                            <td class="variable1"><input type="text" name="tutor" placeholder="Tutor"></td>
-                            <td class="variable1"><input type="number" name="exam_75100" placeholder="Exámen"></td>
-                            <td id="c75100" class="variable1">75% - 100%</td>
-                            <td class="variable1"><input type="number" name="alumnos_75100" placeholder="Alumnos"></td>
+                            <td class="variable1"><input type="text" data-campo="tutor" aria-label="Nombre del Tutor" placeholder="Tutor"></td>
+                            <td class="variable1"><input type="number" data-campo="exam_75100" aria-label="Exámenes 75% - 100%" placeholder="Exámen" min="0"></td>
+                            <td class="variable1" style="background-color: var(--color-verde-claro); font-weight: bold;">75% - 100%</td>
+                            <td class="variable1"><input type="number" data-campo="alumnos_75100" aria-label="Alumnos 75% - 100%" placeholder="Alumnos" min="0"></td>
                             <td class="constante1">15% Desvío</td>
-                            <td class="variable1"><input type="number" name="desvio" placeholder="Desvío"></td>
-                            <td id="avanzados">Alumnos avanzados</td>
-                            <td class="variable1"><input type="number" name="avanzados" placeholder="Alumnos"></td>
+                            <td class="variable1"><input type="number" data-campo="desvio" aria-label="15% Desvío" placeholder="Desvío" min="0"></td>
+                            <td style="background-color: var(--color-verde); font-weight: bold;">Alumnos avanzados</td>
+                            <td class="variable1"><input type="number" data-campo="avanzados" aria-label="Alumnos avanzados" placeholder="Alumnos" min="0"></td>
                         </tr>
 
                         <tr>
                             <td class="constante1">Fecha Fin</td>
-                            <td class="variable1"><input type="date" name="fechafin"></td>
+                            <td class="variable1"><input type="date" data-campo="fechafin" aria-label="Fecha de Fin"></td>
                             <td class="constante1">Horario Tutoría</td>
-                            <td class="variable1"><input type="text" name="tutoria" placeholder="13:00 - 16:00"></td>
-                            <td class="variable1"><input type="number" name="exam_50" placeholder="Exámen"></td>
-                            <td id="c50" class="variable1">50%</td>
-                            <td class="variable1"><input type="number" name="alumnos_50" placeholder="Alumnos"></td>
+                            <td class="variable1"><input type="text" data-campo="tutoria" aria-label="Horario de Tutoría" placeholder="13:00 - 16:00"></td>
+                            <td class="variable1"><input type="number" data-campo="exam_50" aria-label="Exámenes 50%" placeholder="Exámen" min="0"></td>
+                            <td class="variable1" style="background-color: var(--color-naranja); font-weight: bold;">50%</td>
+                            <td class="variable1"><input type="number" data-campo="alumnos_50" aria-label="Alumnos 50%" placeholder="Alumnos" min="0"></td>
                             <td class="constante1">Alumnos subvencionables</td>
-                            <td class="variable1"><input type="number" name="subvencionables" placeholder="Subv."></td>
-                            <td id="rezagados">Alumnos rezagados</td>
-                            <td class="variable1"><input type="number" name="rezagados" placeholder="Rezag."></td>
+                            <td class="variable1"><input type="number" data-campo="subvencionables" aria-label="Alumnos subvencionables" placeholder="Subv." min="0"></td>
+                            <td style="background-color: var(--color-rojo); font-weight: bold;">Alumnos rezagados</td>
+                            <td class="variable1"><input type="number" data-campo="rezagados" aria-label="Alumnos rezagados" placeholder="Rezag." min="0"></td>
                         </tr>
 
                         <tr>
                             <td class="constante1">Horas</td>
-                            <td class="variable1"><input type="number" name="horas" placeholder="Horas"></td>
+                            <td class="variable1"><input type="number" data-campo="horas" aria-label="Horas" placeholder="Horas" min="0"></td>
                             <td class="constante1">Dinamizador</td>
-                            <td class="variable1"><input type="text" name="dinamizador" placeholder="Dinamizador"></td>
-                            <td class="variable1"><input type="number" name="exam_25" placeholder="Exámen"></td>
-                            <td id="c25" class="variable1">25%</td>
-                            <td class="variable1"><input type="number" name="alumnos_25" placeholder="Alumnos"></td>
-                            <td class="variable1" id="totalalumnos" rowspan="2">Total alumnos</td>
-                            <td class="variable1" rowspan="2"><input type="number" name="total" placeholder="Total"></td>
+                            <td class="variable1"><input type="text" data-campo="dinamizador" aria-label="Dinamizador" placeholder="Dinamizador"></td>
+                            <td class="variable1"><input type="number" data-campo="exam_25" aria-label="Exámenes 25%" placeholder="Exámen" min="0"></td>
+                            <td class="variable1" style="background-color: var(--color-amarillo); font-weight: bold;">25%</td>
+                            <td class="variable1"><input type="number" data-campo="alumnos_25" aria-label="Alumnos 25%" placeholder="Alumnos" min="0"></td>
+                            <td class="variable1" style="background-color: var(--color-azul-claro); font-weight: bold;" rowspan="2">Total alumnos</td>
+                            <td class="variable1" rowspan="2"><input type="number" data-campo="total" aria-label="Total alumnos" placeholder="Total" min="0"></td>
                             <td class="sinborde" colspan="2" rowspan="2"></td>
                         </tr>
 
                         <tr>
                             <td class="constante1">25% de matriculación</td>
-                            <td class="variable1"><input type="date" name="matriculacion"></td>
+                            <td class="variable1"><input type="date" data-campo="matriculacion" aria-label="Fecha 25% de matriculación"></td>
                             <td class="constante1">25% de conexión</td>
-                            <td class="variable1"><input type="date" name="conexion"></td>
-                            <td class="variable1"><input type="number" name="exam_m25" placeholder="Exámen"></td>
-                            <td id="cm25" class="variable1">Menos del 25%</td>
-                            <td class="variable1"><input type="number" name="alumnos_m25" placeholder="Alumnos"></td>
+                            <td class="variable1"><input type="date" data-campo="conexion" aria-label="Fecha 25% de conexión"></td>
+                            <td class="variable1"><input type="number" data-campo="exam_m25" aria-label="Exámenes menos del 25%" placeholder="Exámen" min="0"></td>
+                            <td class="variable1" style="background-color: var(--color-rosa-claro); font-weight: bold;">Menos del 25%</td>
+                            <td class="variable1"><input type="number" data-campo="alumnos_m25" aria-label="Alumnos menos del 25%" placeholder="Alumnos" min="0"></td>
                         </tr>
                     </tbody>
                 </table>
                 
                 <div class="contenedor-boton">
+                    <!-- Contenedor para mensajes de error al lado del botón -->
+                    <span id="mensaje-error" style="color: red; margin-right: 15px; font-weight: bold; display: none;"></span>
                     <button type="submit" id="botonguardar">Guardar Cambios</button>
                 </div>
             </form>
         </div>
     </div>
 
-
-
-    <div id="footer">
-        <a href="#"> <img src="logo footer.webp" alt="Logo Académica Colón" width="30" height="30"></a>
-        <a>© 2026 Grupo Colón IECM</a>
-        
-    </div>
+    <!-- Notificación Toast -->
+    <div id="toast-guardado" class="toast">Cambios guardados con éxito</div>
 
     <script src="script.js"></script>
 </body>
