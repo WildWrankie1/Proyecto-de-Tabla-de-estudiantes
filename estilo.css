@@ -1,11 +1,29 @@
+:root {
+    --color-fondo-pagina: #f5f5f5;
+    --color-blanco: #ffffff;
+    --color-negro: #000000;
+    --color-borde: #d8d8d8;
+    
+    /* Paleta del Dashboard */
+    --color-primario: #3c6e9c;
+    --color-verde: #79be4b;
+    --color-rojo: #ff6363;
+    --color-rosa-fuerte: #ff4ea6;
+    --color-azul-claro: #cde1ff;
+    --color-verde-claro: #98caab;
+    --color-naranja: #ffd597;
+    --color-amarillo: #f8f669;
+    --color-rosa-claro: #fdd3d3;
+    --color-focus: #f0f7ff;
+}
+
 body { 
-    background-color: #f5f5f5; 
+    background-color: var(--color-fondo-pagina); 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-/* Contenedor principal centrado */
 .contenedor-principal { 
     width: fit-content;
     max-width: 95%;
@@ -14,7 +32,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Cada cuadro tiene su propio scroll horizontal independiente */
 .caja-scroll {
     overflow-x: auto;
     width: 100%;
@@ -25,10 +42,10 @@ body {
     background-color: rgba(0, 0, 0, 0.5); 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     text-align: center;
-    color: #000000;
+    color: var(--color-negro);
     font-size: 20px;
     font-weight: bold;
-    text-shadow: 0 0 10px #f5f5f5;
+    text-shadow: 0 0 10px var(--color-fondo-pagina);
     padding: 10px;
     margin: 0 0 10px 0;
     border: none;
@@ -44,7 +61,6 @@ body {
     width: 100%;
     z-index: 100;
     backdrop-filter: blur(10px);
-    transition: all 0.3s;
     box-sizing: border-box;
 }
 
@@ -72,10 +88,10 @@ table {
 
 td {
     padding: 6px 10px;
-    border: 1px solid #d8d8d8;
+    border: 1px solid var(--color-borde);
     text-align: center;
     font-size: 14px;
-    background-color: #ffffff;
+    background-color: var(--color-blanco);
 }
 
 .constante1, #avanzados, #rezagados, #nalumnos, #totalalumnos {
@@ -84,8 +100,8 @@ td {
 }
 
 .variable1 {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: var(--color-blanco);
+    color: var(--color-negro);
     min-width: 90px;
     box-sizing: border-box;
 }
@@ -103,62 +119,29 @@ table input {
 }
 
 table input:focus {
-    background-color: #f0f7ff;
+    background-color: var(--color-focus);
 }
 
+/* Usando las variables CSS */
 .constante1 {
-    background-color: #3c6e9c;
-    color: #f5f5f5;
+    background-color: var(--color-primario);
+    color: var(--color-fondo-pagina);
     font-weight: bold;
 }
 
-#avanzados {
-    background-color: #79be4b;
-    font-weight: bold;
-}
-
-#rezagados {
-    background-color: #ff6363;
-    font-weight: bold;
-}
-
-#cantexam {
-    background-color: #ff4ea6;
-}
-
-#nalumnos {
-    font-weight: bold;
-}
-
-#totalalumnos {
-    background-color: #cde1ff;
-    font-weight: bold;    
-}
-
-#c75100 {
-    background-color: #98caab;
-    font-weight: bold;
-}
-
-#c50 {
-    background-color: #ffd597;
-    font-weight: bold;
-}
-
-#c25 {
-    background-color: #f8f669;
-    font-weight: bold;
-}
-
-#cm25 {
-    background-color: #fdd3d3;
-    font-weight: bold;
-}
+#avanzados { background-color: var(--color-verde); font-weight: bold; }
+#rezagados { background-color: var(--color-rojo); font-weight: bold; }
+#cantexam { background-color: var(--color-rosa-fuerte); }
+#nalumnos { font-weight: bold; }
+#totalalumnos { background-color: var(--color-azul-claro); font-weight: bold; }
+#c75100 { background-color: var(--color-verde-claro); font-weight: bold; }
+#c50 { background-color: var(--color-naranja); font-weight: bold; }
+#c25 { background-color: var(--color-amarillo); font-weight: bold; }
+#cm25 { background-color: var(--color-rosa-claro); font-weight: bold; }
 
 .sinborde {
     border: none !important;
     background-color: transparent !important;
-    background: transparent !important;
 }
 
 form {
@@ -171,14 +154,48 @@ form {
     text-align: right;
     margin-top: 10px;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 #botonguardar {
     padding: 8px 16px;
-    background-color: #3c6e9c;
+    background-color: var(--color-primario);
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#botonguardar:hover {
+    background-color: #2b5074;
+}
+
+/* Estilos de la notificación Toast */
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+}
+
+.toast.mostrar {
+    visibility: visible;
+    bottom: 50px;
+    opacity: 1;
 }
