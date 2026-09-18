@@ -122,7 +122,7 @@ table input:focus {
     background-color: var(--color-focus);
 }
 
-/* Usando las variables CSS */
+/* Variables CSS */
 .constante1 {
     background-color: var(--color-primario);
     color: var(--color-fondo-pagina);
@@ -174,8 +174,8 @@ form {
     background-color: #2b5074;
 }
 
-/* Estilos de la notificación Toast */
-.toast {
+/* Estilos Toast */
+.alertaguardado {
     visibility: hidden;
     min-width: 250px;
     background-color: #333;
@@ -194,7 +194,7 @@ form {
     transition: opacity 0.5s, bottom 0.5s;
 }
 
-.toast.mostrar {
+.alertaguardado.mostrar {
     visibility: visible;
     bottom: 50px;
     opacity: 1;
