@@ -122,7 +122,6 @@ table input:focus {
     background-color: var(--color-focus);
 }
 
-/* Variables CSS */
 .constante1 {
     background-color: var(--color-primario);
     color: var(--color-fondo-pagina);
@@ -198,4 +197,12 @@ form {
     visibility: visible;
     bottom: 50px;
     opacity: 1;
+}
+
+/* Estilo para campos calculados automáticamente */
+table input[readonly] {
+    background-color: #f9f9f9;
+    color: #555555;
+    cursor: default;
+    pointer-events: none;
 }
