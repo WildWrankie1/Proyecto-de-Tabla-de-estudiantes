@@ -89,4 +89,49 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.classList.remove("mostrar");
         }, 3000);
     });
+
+    // --- FUNCIÓN PARA EXPORTAR A CSV (Excel) ---
+    const btnDescargar = document.getElementById('btn-descargar-excel');
+    
+    if (btnDescargar) {
+        btnDescargar.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita recargar la página o saltar arriba
+            
+            const displayTable = document.querySelector('.caja-scroll table');
+            if (!displayTable) {
+                console.error("No se encontró la tabla de datos.");
+                return;
+            }
+
+            let csvContent = "";
+            const idGuiaElement = document.querySelector('[data-campo="idguia"]');
+            const idGuia = idGuiaElement ? idGuiaElement.textContent.trim() : "Datos_Curso";
+            
+            // Recorrer filas de la tabla de visualización
+            for (let i = 0; i < displayTable.rows.length; i++) {
+                let row = displayTable.rows[i];
+                let rowData = [];
+                
+                for (let j = 0; j < row.cells.length; j++) {
+                    let cell = row.cells[j];
+                    let cellText = cell.innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
+                    rowData.push(`"${cellText}"`);
+                }
+                
+                csvContent += rowData.join(";") + "\r\n";
+            }
+            
+            // Generación y descarga del archivo CSV/Excel
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Reporte_${idGuia.replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url); // Libera memoria
+        });
+    }
 });
