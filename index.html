@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <div id="header">
+    <div id="header" class="no-imprimir">
         <a href=""><img src="logo.webp" alt="Logo Académica Colón" width="150px"></a>
         <a href="" target="_blank">Inicio</a>
         <a href="" target="_blank">Portales</a>
@@ -30,7 +30,7 @@
                         <td class="constante1">Nombre de Curso</td>
                         <td class="variable1" data-campo="nombre"></td>
                         <td class="constante1">Nº de Exámenes</td>
-                        <td class="variable1" id="cantexam" data-campo="examenes"></td>
+                        <td class="variable1" id="cantexam" data-campo="examenes">5</td>
                         <td class="constante1" id="nalumnos">Nº de Alumnos</td>
                         <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
                         <td class="variable1" data-campo="maxsub"></td>
@@ -43,9 +43,9 @@
                         <td class="variable1" data-campo="fechainicio"></td>
                         <td class="constante1">Tutor</td>
                         <td class="variable1" data-campo="tutor"></td>
-                        <td class="variable1" data-campo="exam_75100">4</td>
+                        <td class="variable1" data-campo="exam_75100"></td>
                         <td id="c75100" class="variable1">75% - 100%</td>
-                        <td class="variable1" data-campo="alumnos_75100">6</td>
+                        <td class="variable1" data-campo="alumnos_75100"></td>
                         <td class="constante1">15% Desvío</td>
                         <td class="variable1" data-campo="desvio"></td>
                         <td id="avanzados">Alumnos avanzados</td>
@@ -114,7 +114,7 @@
                         <td class="constante1">Última Actualización</td>
                         <td>Responsable 08-09-2026 11:02</td>
                         <td><a href="#" target="_blank">Ver en Moodle</a></td>
-                        <td><a href="#" id="btn-descargar-excel" style="cursor: pointer; color: #003cff; text-decoration: underline;">Descargar Excel</a></td>
+                        <td><a id="btn-descargar-excel" style="cursor: pointer; color: #003cff; text-decoration: underline;">Descargar Excel</a></td>
                         <td><a href="#" target="_blank" type="button">Ver Calendario</a></td>
                         <td><a href="#" target="_blank" type="button">Editar Calendario</a></td>
                         <td><a href="#" target="_blank" type="button">Actualizar informe</a></td>
@@ -123,10 +123,10 @@
             </table>
         </div>
 
-        <h1><small>Formulario</small></h1>
+        <h1 class="no-imprimir"><small>Formulario</small></h1>
 
         <!-- Formulario -->
-        <div class="caja-scroll">
+        <div class="caja-scroll no-imprimir">
             <form action="index.html" method="post" id="form-edicion">
                 <table>
                     <tbody>
@@ -206,7 +206,7 @@
     </div>
 
     <!-- Notificación Toast -->
-    <div id="alertaguardado" class="alertaguardado">Cambios guardados con éxito</div>
+    <div id="alertaguardado" class="alertaguardado no-imprimir">Cambios guardados con éxito</div>
 
     <script src="script.js"></script>
 </body>
