@@ -206,3 +206,53 @@ table input[readonly] {
     cursor: default;
     pointer-events: none;
 }
+
+/* Animación de destello visual para celdas modificadas */
+@keyframes destelloActualizacion {
+    0% {
+        background-color: #c8e6c9; /* Verde claro pastel */
+        box-shadow: inset 0 0 4px #4caf50;
+    }
+    100% {
+        background-color: var(--color-blanco);
+        box-shadow: none;
+    }
+}
+
+.celda-actualizada {
+    animation: destelloActualizacion 1.5s ease-out;
+}
+
+/* --- ESTILOS DE IMPRESIÓN Y PDF (@media print) --- */
+@media print {
+    .no-imprimir {
+        display: none !important;
+    }
+
+    body {
+        background-color: #ffffff !important;
+        font-size: 12pt;
+    }
+
+    .contenedor-principal {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .caja-scroll {
+        overflow: visible !important;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    td {
+        padding: 4px 8px;
+        font-size: 10pt;
+    }
+}
