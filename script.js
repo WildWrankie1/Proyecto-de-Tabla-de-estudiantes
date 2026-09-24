@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- OBTENER Y FORMATEAR FECHA ACTUAL (DD-MM-AA) ---
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const anio = String(hoy.getFullYear()).slice(-2); // Toma los últimos 2 dígitos del año
+    const fechaActualFormateada = `${dia}-${mes}-${anio}`;
+
+    // Inyectar la fecha actual en todos los encabezados marcados
+    document.querySelectorAll('.fecha-eval-actual').forEach(el => {
+        el.textContent = fechaActualFormateada;
+    });
+
     const form = document.getElementById('form-edicion');
     const toast = document.getElementById('alertaguardado');
     const mensajeError = document.getElementById('mensaje-error');
@@ -139,15 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const celdaDestino = document.querySelector(`.caja-scroll table [data-campo="${campoNombre}"]`);
                 
                 if (celdaDestino) {
-                    // Solo si el valor ha cambiado aplicamos la animación
                     if (celdaDestino.textContent.trim() !== valor) {
                         celdaDestino.textContent = valor;
 
-                        // Obtener el elemento a animar (la propia celda o su contenedor si es <a>)
                         const elementoAAnimar = celdaDestino.tagName.toLowerCase() === 'a' ? celdaDestino.parentElement : celdaDestino;
 
                         elementoAAnimar.classList.remove('celda-actualizada');
-                        void elementoAAnimar.offsetWidth; // Forzar reflow para reiniciar la animación
+                        void elementoAAnimar.offsetWidth;
                         elementoAAnimar.classList.add('celda-actualizada');
 
                         setTimeout(() => {
@@ -182,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let rowData = [];
                 for (let j = 0; j < row.cells.length; j++) {
                     let cell = row.cells[j];
-                    let cellText = cell.innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
+                    let cellText = cell.innserText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
                     rowData.push(`"${cellText}"`);
                 }
                 csvContent += rowData.join(";") + "\r\n";
