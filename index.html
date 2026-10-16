@@ -34,7 +34,7 @@
                         <td class="constante1" id="nalumnos">Nº de Alumnos</td>
                         <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
                         <td class="variable1" data-campo="maxsub"></td>
-                        <td class="constante1">Evaluación referencia<br> a <span class="fecha-eval-actual"></span></td>
+                        <td class="constante1">Evaluación referencia a<br><span class="fecha-eval-actual"></span></td>
                         <td class="variable1" data-campo="referencia"></td>
                     </tr>
 
@@ -98,27 +98,28 @@
                 <tbody>
                     <tr>
                         <td class="constante1">Fecha 50%</td>
-                        <td></td>
+                        <td id="fecha-50" class="variable1"></td>
                         <td class="constante1">Fecha 75%</td>
-                        <td></td>
+                        <td id="fecha-75" class="variable1"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Cuadro 3 -->
+
         <div class="caja-scroll">
             <table>
                 <tbody>
                     <tr>
-                        <td class="constante1">Última Actualización</td>
+                        <!--<td class="constante1">Última Actualización</td>
                         <td>Responsable 08-09-2026 11:02</td>
-                        <td><a href="#" target="_blank">Ver en Moodle</a></td>
+                        <td><a href="#" target="_blank">Ver en Moodle</a></td>-->
                         <td><a id="btn-descargar-excel" style="cursor: pointer; color: #003cff; text-decoration: underline;">Descargar Excel</a></td>
-                        <td><a href="#" target="_blank" type="button">Ver Calendario</a></td>
+                        <!--<td><a href="#" target="_blank" type="button">Ver Calendario</a></td>
                         <td><a href="#" target="_blank" type="button">Editar Calendario</a></td>
                         <td><a href="#" target="_blank" type="button">Actualizar informe</a></td>
-                    </tr>
+                    --></tr>
                 </tbody>
             </table>
         </div>
@@ -140,7 +141,7 @@
                             <td class="constante1">Nº de Alumnos</td>
                             <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
                             <td class="variable1"><input type="number" data-campo="maxsub" aria-label="Máximo alumnos subvencionables" placeholder="Máx. Subv." min="0"></td>
-                            <td class="constante1">Evaluación referencia<br> a <span class="fecha-eval-actual"></span></td>
+                            <td class="constante1">Evaluación referencia a<br><span class="fecha-eval-actual"></span></td>
                             <td class="variable1"><input type="number" data-campo="referencia" aria-label="Evaluación de referencia" placeholder="Ref." min="0"></td>
                         </tr>
 
@@ -202,6 +203,188 @@
                     <button type="submit" id="botonguardar">Guardar Cambios</button>
                 </div>
             </form>
+        </div>
+
+        <!-- Barra Desplegable: Tabla de Seguimiento -->
+<div class="acordeon-seccion">
+    <!-- Encabezado clicable -->
+    <div class="acordeon-header" id="btn-acordeon">
+        <span>Tabla Seguimiento</span>
+        <span class="acordeon-icono">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </span>
+    </div>
+
+    <!-- Contenido que se despliega -->
+    <div class="acordeon-contenido" id="contenido-acordeon">
+        <!-- Barra de herramientas superior -->
+        <div class="barra-herramientas">
+            <div class="herramientas-izq">
+                <span class="rango-paginacion" id="contador-alumnos">1 - 13</span>
+
+
+                <!-- <select class="select-grupos">
+                    <option>Grupos disponibles del curso</option>
+                </select>
+                <button type="button" class="btn-asignar">Asignar</button>
+            </div>
+            <div class="herramientas-der"> -->
+
+
+            <div class="herramientas-der">
+                <div class="caja-buscar">
+                    <svg class="icono-buscar" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                <input type="text" id="buscador-alumnos" placeholder="Buscar...">
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Tabla de alumnos -->
+        <div class="caja-scroll-seguimiento">
+            <table class="tabla-seguimiento" id="tabla-alumnos">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="check-maestro" checked></th>
+                        <th>Apellidos</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>S. Laboral</th>
+                        <th>1ª Conexión</th>
+                        <th>Última Conexión</th>
+                        <th>Conexión Total</th>
+                        <th>P.ECO 1<br><small>Cuestionario</small></th>
+                        <th>P.ECO 2<br><small>Subida archivo</small></th>
+                        <th>P.ECO 3<br><small>Correo</small></th>
+                        <th>P.ECO 4<br><small>Foro</small></th>
+                        <th>Observaciones Responsable</th>
+                        <th>Observaciones Tutor</th>
+                        <th>Ev.<br>Realizadas</th>
+                        <th>Contenidos</th>
+                        <th>Nota<br>Final</th>
+                        <th>Tipo Alumno</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. <input type="checkbox" class="check-alumno"></td>
+                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
+                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
+                        <td>
+                            <a href="#" target="_blank" class="link-tel" contenteditable="true" data-tipo="tel"></a>
+                        </td>
+                        <td>
+                            <a href="#" class="link-mail" contenteditable="true" data-tipo="email"></a>
+                        </td>
+                        <td>
+                            <select class="select-laboral">
+                                <option value="Ocu">Ocu</option>
+                                <option value="Des">Des</option>
+                            </select>
+                        </td>
+                        <td class="col-rosa-pastel" contenteditable="true"></td>
+                        <td class="col-rosa-pastel" contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td class="celda-observacion"></td> <!-- Esta es Responsable -->
+                        <td class="celda-observacion"></td> <!-- Esta es Tutor -->
+                        <td class="col-verde-pastel" contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <!-- Reemplaza la última celda por este select -->
+                        <td class="col-estado-finalizado">
+                            <select class="select-tipo-alumno">
+                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="REZAGADO">REZAGADO</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2. <input type="checkbox" class="check-alumno"></td>
+                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
+                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
+                        <td>
+                            <a href="#" target="_blank" class="link-tel" contenteditable="true" data-tipo="tel"></a>
+                        </td>
+                        <td>
+                            <a href="#" class="link-mail" contenteditable="true" data-tipo="email"></a>
+                        </td>
+                        <td>
+                            <select class="select-laboral">
+                                <option value="Ocu">Ocu</option>
+                                <option value="Des">Des</option>
+                            </select>
+                        </td>
+                        <td class="col-rosa-pastel" contenteditable="true"></td>
+                        <td class="col-rosa-pastel" contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
+                        <td class="celda-observacion"></td> <!-- Esta es Responsable -->
+                        <td class="celda-observacion"></td> <!-- Esta es Tutor -->
+                        <td class="col-verde-pastel" contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <td contenteditable="true"></td>
+                        <!-- Reemplaza la última celda por este select -->
+                        <td class="col-estado-finalizado">
+                            <select class="select-tipo-alumno">
+                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="REZAGADO">REZAGADO</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botones para gestionar filas de alumnos -->
+        <div style="margin-top: 10px; text-align: left; display: flex; gap: 8px;">
+            <button type="button" id="btn-agregar-alumno" style="background-color: var(--color-primario); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                + Añadir Alumno
+            </button>
+            <button type="button" id="btn-eliminar-alumno" style="background-color: var(--color-rojo); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                - Eliminar Alumno
+            </button>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Ventana Modal para Observaciones -->
+    <div id="modal-observaciones" class="modal-overlay oculto no-imprimir">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2 id="modal-titulo">OBSERVACIONES</h2>
+                <div class="modal-controles">
+                    <div style="display: flex; flex-direction: column; font-size: 12px; font-weight: bold;">
+                        <label for="modal-color">Seleccione un Color</label>
+                        <select id="modal-color">
+                            <option value="#9ecc86" style="background-color: #9ecc86;">Verde</option>
+                            <option value="#f8f669" style="background-color: #f8f669;">Amarillo</option>
+                            <option value="#fdd3d3" style="background-color: #fdd3d3;">Rosa</option>
+                            <option value="#ffffff" style="background-color: #ffffff;">Blanco</option>
+                        </select>
+                    </div>
+                    <span class="cerrar-modal" id="btn-cerrar-x">&times;</span>
+                </div>
+            </div>
+            <textarea id="modal-textarea" rows="8"></textarea>
+            <div class="modal-footer">
+                <button type="button" id="btn-cancelar-modal" class="btn-cancelar">Cancelar</button>
+                <button type="button" id="btn-guardar-modal" class="btn-guardar">Guardar</button>
+            </div>
         </div>
     </div>
 
