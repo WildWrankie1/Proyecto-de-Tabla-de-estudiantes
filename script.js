@@ -20,6 +20,24 @@ const db = getFirestore(app);
 const normalizarIdDoc = (id) => encodeURIComponent(id.trim().toUpperCase());
 
 let cursoActualId = null;
+// --- NUEVO: Variable para rastrear cambios sin guardar ---
+window.hayCambiosSinGuardar = false;
+
+// Alerta nativa del navegador al intentar cerrar la pestaña si hay cambios sin guardar
+window.addEventListener('beforeunload', (e) => {
+    if (window.hayCambiosSinGuardar) {
+        e.preventDefault();
+        e.returnValue = ''; 
+    }
+});
+
+// Detectar cualquier escritura, pero IGNORAR si solo estamos escribiendo el ID a buscar
+document.addEventListener('input', (e) => { 
+    if (e.target.getAttribute('data-campo') !== 'idguia') window.hayCambiosSinGuardar = true; 
+});
+document.addEventListener('change', (e) => { 
+    if (e.target.getAttribute('data-campo') !== 'idguia') window.hayCambiosSinGuardar = true; 
+});
 
 const animarElemento = (elemento) => {
     if (!elemento) return;
@@ -46,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
+            if (window.hayCambiosSinGuardar && !confirm("Tienes cambios sin guardar. ¿Seguro que quieres salir?")) {
+                return;
+            }
             localStorage.removeItem('ultimoCursoActivo');
             signOut(auth).then(() => window.location.href = "login.html")
             .catch((error) => console.error("Error al salir", error));
@@ -148,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         actualizarContadorAlumnos();
         window.sincronizarTotales();
+        window.hayCambiosSinGuardar = false; // Estado limpio
 
         if (!mantenerId && inputIdGuia) inputIdGuia.focus();
     };
@@ -155,13 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNuevoCurso = document.getElementById('btn-nuevo-curso');
     if (btnNuevoCurso) {
         btnNuevoCurso.addEventListener('click', () => {
-            if (confirm("¿Deseas vaciar la pantalla para registrar un nuevo curso?")) {
-                resetearFormularioYTabla(false);
+            if (window.hayCambiosSinGuardar && !confirm("Tienes cambios sin guardar. ¿Deseas descartarlos y empezar un nuevo curso?")) {
+                return;
+            } else if (!window.hayCambiosSinGuardar && !confirm("¿Deseas vaciar la pantalla para registrar un nuevo curso?")) {
+                return;
             }
+            resetearFormularioYTabla(false);
         });
     }
 
-    // Búsqueda de cursos al salir del campo ID Guía
+
+
+
+   // --- BÚSQUEDA Y PREVENCIÓN DE SOBREESCRITURA ACCIDENTAL ---
     if (inputIdGuia) {
         inputIdGuia.addEventListener('blur', async (e) => {
             const idBuscado = e.target.value.trim().toUpperCase();
@@ -169,12 +197,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (idBuscado === '' || idBuscado === cursoActualId) return;
 
+            // VALIDACIÓN DE FORMATO nn/nnnn
+            const formatoValido = /^\d{2}\/\d{4}$/;
+            if (!formatoValido.test(idBuscado)) {
+                alert("Formato de ID incorrecto. Debe tener el formato numérico de dos dígitos, barra y cuatro dígitos (Ejemplo: 25/2846).");
+                e.target.value = cursoActualId || ''; // Restauramos el ID anterior si se equivocó
+                return;
+            }
+
             try {
                 const docRef = doc(db, "cursos", normalizarIdDoc(idBuscado));
                 const snap = await getDoc(docRef);
 
                 if (snap.exists()) {
-                    if (confirm(`El curso "${idBuscado}" ya existe. ¿Deseas cargarlo para editarlo?`)) {
+                    let mensaje = `El curso "${idBuscado}" ya existe en la nube.\n\n¿Deseas cargarlo para editarlo?`;
+                    if (window.hayCambiosSinGuardar) {
+                        mensaje = `⚠️ ¡Atención! Tienes cambios sin guardar en pantalla que se perderán.\n\nEl curso "${idBuscado}" ya existe en la nube. ¿Deseas descartar lo que estabas haciendo y cargar este curso?`;
+                    }
+
+                    if (confirm(mensaje)) {
                         window.cargarDatosEnInterfaz(snap.data());
                         cursoActualId = idBuscado;
                         localStorage.setItem('ultimoCursoActivo', idBuscado);
@@ -182,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         e.target.value = cursoActualId || '';
                     }
                 } else {
+                    // Es un curso nuevo
                     if (cursoActualId && cursoActualId !== idBuscado) {
                         resetearFormularioYTabla(true);
                     }
@@ -193,6 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+
 
     // Mapeo de campos del formulario
     const inputExamenes = form.querySelector('input[data-campo="examenes"]');
@@ -313,7 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Guardar en Firestore y auditar cambios
+    // --- GUARDAR EN FIRESTORE MANUALMENTE ---
+    const btnGuardarSubmit = document.getElementById('botonguardar');
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         mensajeError.style.display = 'none';
@@ -325,12 +371,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // VALIDACIÓN DE FORMATO nn/nnnn
+        const formatoValido = /^\d{2}\/\d{4}$/;
+        if (!formatoValido.test(idGuiaFinal)) {
+            mensajeError.textContent = "Error: El ID Guía debe tener formato de dos números, barra y cuatro números (ej: 25/2846).";
+            mensajeError.style.display = 'block';
+            inputIdGuia.focus();
+            return;
+        }
+
+        // CAPA DE SEGURIDAD EXTREMA: Evitar pisar cursos no cargados
         if (idGuiaFinal !== cursoActualId) {
             try {
                 const docRefTest = doc(db, "cursos", normalizarIdDoc(idGuiaFinal));
                 const snapTest = await getDoc(docRefTest);
                 if (snapTest.exists()) {
-                    mensajeError.textContent = `Error de seguridad: El curso "${idGuiaFinal}" ya existe. No puedes guardar un curso vacío encima. Haz clic fuera de la casilla del ID para cargarlo primero.`;
+                    mensajeError.textContent = `Error de seguridad: El curso "${idGuiaFinal}" ya existe. Haz clic fuera de la casilla del ID para cargarlo primero.`;
                     mensajeError.style.display = 'block';
                     return;
                 }
@@ -339,6 +395,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
         }
+    
+        
 
         const fIni = form.querySelector('input[data-campo="fechainicio"]').value;
         const fFin = form.querySelector('input[data-campo="fechafin"]').value;
@@ -403,6 +461,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (hayEmailDuplicado) return;
 
+        // --- EFECTO DE CARGA EN EL BOTÓN ---
+        const textoOriginalBoton = btnGuardarSubmit.textContent;
+        btnGuardarSubmit.disabled = true;
+        btnGuardarSubmit.textContent = '⏳ Guardando en la nube...';
+        btnGuardarSubmit.style.opacity = '0.7';
+        btnGuardarSubmit.style.cursor = 'not-allowed';
+
         window.actualizarTablasSuperiores();
 
         const datosFormulario = {};
@@ -431,12 +496,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             cursoActualId = idGuiaFinal;
             localStorage.setItem('ultimoCursoActivo', idGuiaFinal);
+            window.hayCambiosSinGuardar = false; // Se guardó con éxito
 
             toast.classList.add("mostrar");
             setTimeout(() => toast.classList.remove("mostrar"), 3000);
         } catch (error) {
             console.error("Error guardando en Firestore:", error);
             alert("Hubo un error guardando en la nube. Revisa la consola.");
+        } finally {
+            // Restaurar el botón siempre, haya error o éxito
+            btnGuardarSubmit.disabled = false;
+            btnGuardarSubmit.textContent = textoOriginalBoton;
+            btnGuardarSubmit.style.opacity = '1';
+            btnGuardarSubmit.style.cursor = 'pointer';
         }
     });
 
@@ -499,6 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tbody.appendChild(nuevaFila);
             actualizarContadorAlumnos();
             window.sincronizarTotales();
+            window.hayCambiosSinGuardar = true;
         });
     }
 
@@ -507,10 +580,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkMaestro) {
         checkMaestro.addEventListener('change', function() {
             tablaAlumnos.querySelectorAll('.check-alumno').forEach(cb => cb.checked = this.checked);
+            window.hayCambiosSinGuardar = true;
         });
     }
 
-    // Enlaces reactivos
+    // Enlaces reactivos en edición directa
     tablaAlumnos.addEventListener('input', (e) => {
         const elemento = e.target;
         if (elemento.getAttribute('data-tipo') === 'tel') {
@@ -531,7 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 elemento.removeAttribute('href');
             }
         }
-        window.sincronizarTotales();
     });
 
     tablaAlumnos.addEventListener('click', (e) => {
@@ -589,6 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
             celdaActiva.innerText = lineas[0].trim() === time ? (lineas.shift(), lineas.join('\n').trim()) : modalTextarea.value.trim();
             celdaActiva.dataset.color = modalColor.value;
             celdaActiva.style.setProperty('background-color', modalColor.value, 'important');
+            window.hayCambiosSinGuardar = true;
         }
         cerrarModal();
     });
@@ -614,20 +688,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 selec.forEach(f => f.remove());
                 renumerarFilas();
                 if (checkMaestro) checkMaestro.checked = false;
+                window.hayCambiosSinGuardar = true;
             }
         } else if (confirm("¿Eliminar la última fila?")) {
             filas[filas.length - 1].remove();
             renumerarFilas();
+            window.hayCambiosSinGuardar = true;
         }
     });
 
-    // Tipo Alumno color
+    // Cambio de estado en Tipo Alumno
     tablaAlumnos.addEventListener('change', (e) => {
         if (e.target.classList.contains('select-tipo-alumno')) {
             const celda = e.target.closest('td');
             celda.classList.toggle('col-estado-rezagado', e.target.value === 'REZAGADO');
             celda.classList.toggle('col-estado-finalizado', e.target.value === 'FINALIZADO');
             window.sincronizarTotales();
+            window.hayCambiosSinGuardar = true;
         }
     });
 
@@ -785,4 +862,7 @@ window.cargarDatosEnInterfaz = function(data) {
             if (window.sincronizarTotales) window.sincronizarTotales();
         }
     }
+    
+    // Al cargar de la base de datos, el estado está limpio
+    window.hayCambiosSinGuardar = false; 
 };
