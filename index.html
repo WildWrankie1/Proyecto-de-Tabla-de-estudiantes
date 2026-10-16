@@ -1,396 +1,801 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabla de estudiantes</title>
-    <link rel="stylesheet" href="estilo.css">
-</head>
-<body>
+:root {
+    --color-fondo-pagina: #f5f5f5;
+    --color-blanco: #ffffff;
+    --color-negro: #000000;
+    --color-borde: #d8d8d8;
+    
+    /* Paleta del Dashboard */
+    --color-primario: #3c6e9c;
+    --color-verde: #79be4b;
+    --color-rojo: #ff6363;
+    --color-rosa-fuerte: #ff4ea6;
+    --color-azul-claro: #cde1ff;
+    --color-verde-claro: #98caab;
+    --color-naranja: #ffd597;
+    --color-amarillo: #f8f669;
+    --color-rosa-claro: #fdd3d3;
+    --color-focus: #f0f7ff;
+}
 
-    <div id="header" class="no-imprimir">
-        <a href=""><img src="logo.webp" alt="Logo Académica Colón" width="150px"></a>
-        <a href="" target="_blank">Inicio</a>
-        <a href="" target="_blank">Portales</a>
-        <a href="" target="_blank">Gestionar cursos</a>
-        <a href="" target="_blank">Aula Virtual</a>
-        <a href="login.html">📤</a>
-    </div>
+body { 
+    background-color: var(--color-fondo-pagina); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
 
-    <h1>Datos del curso (25/2846)</h1>
+.contenedor-principal { 
+    width: fit-content;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
 
-    <div class="contenedor-principal">
-        <!-- Cuadro 1: Tabla Principal de Datos -->
-        <div class="caja-scroll">
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="constante1">ID Guía</td>
-                        <td class="variable1"><a href="#" target="_blank" data-campo="idguia"></a></td>
-                        <td class="constante1">Nombre de Curso</td>
-                        <td class="variable1" data-campo="nombre"></td>
-                        <td class="constante1">Nº de Exámenes</td>
-                        <td class="variable1" id="cantexam" data-campo="examenes">5</td>
-                        <td class="constante1" id="nalumnos">Nº de Alumnos</td>
-                        <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
-                        <td class="variable1" data-campo="maxsub"></td>
-                        <td class="constante1">Evaluación referencia a<br><span class="fecha-eval-actual"></span></td>
-                        <td class="variable1" data-campo="referencia"></td>
-                    </tr>
+.caja-scroll {
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 15px;
+}
 
-                    <tr>
-                        <td class="constante1">Fecha Inicio</td>
-                        <td class="variable1" data-campo="fechainicio"></td>
-                        <td class="constante1">Tutor</td>
-                        <td class="variable1" data-campo="tutor"></td>
-                        <td class="variable1" data-campo="exam_75100"></td>
-                        <td id="c75100" class="variable1">75% - 100%</td>
-                        <td class="variable1" data-campo="alumnos_75100"></td>
-                        <td class="constante1">15% Desvío</td>
-                        <td class="variable1" data-campo="desvio"></td>
-                        <td id="avanzados">Alumnos avanzados</td>
-                        <td class="variable1" data-campo="avanzados"></td>
-                    </tr>
+#header {
+    background-color: rgba(0, 0, 0, 0.5); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    text-align: center;
+    color: var(--color-negro);
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px var(--color-fondo-pagina);
+    padding: 10px;
+    margin: 0 0 10px 0;
+    border: none;
+    box-shadow: 0 0 10px rgba(197, 24, 24, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    box-sizing: border-box;
+}
 
-                    <tr>
-                        <td class="constante1">Fecha Fin</td>
-                        <td class="variable1" data-campo="fechafin"></td>
-                        <td class="constante1">Horario Tutoría</td>
-                        <td class="variable1" data-campo="tutoria"></td>
-                        <td class="variable1" data-campo="exam_50"></td>
-                        <td id="c50" class="variable1">50%</td>
-                        <td class="variable1" data-campo="alumnos_50"></td>
-                        <td class="constante1">Alumnos subvencionables</td>
-                        <td class="variable1" data-campo="subvencionables"></td>
-                        <td id="rezagados">Alumnos rezagados</td>
-                        <td class="variable1" data-campo="rezagados"></td>
-                    </tr>
+#header > a:first-child {
+    position: absolute;
+    left: 20px;
+    display: flex;
+    align-items: center;
+}
 
-                    <tr>
-                        <td class="constante1">Horas</td>
-                        <td class="variable1" data-campo="horas"></td>
-                        <td class="constante1">Dinamizador</td>
-                        <td class="variable1" data-campo="dinamizador"></td>
-                        <td class="variable1" data-campo="exam_25"></td>
-                        <td id="c25" class="variable1">25%</td>
-                        <td class="variable1" data-campo="alumnos_25"></td>
-                        <td class="variable1" id="totalalumnos" rowspan="2">Total alumnos</td>
-                        <td class="variable1" rowspan="2" data-campo="total"></td>
-                        <td class="sinborde" colspan="2" rowspan="2"></td>
-                    </tr>
+a {
+    text-decoration: none;
+}
 
-                    <tr>
-                        <td class="constante1">25% de matriculación</td>
-                        <td class="variable1" data-campo="matriculacion"></td>
-                        <td class="constante1">25% de conexión</td>
-                        <td class="variable1" data-campo="conexion"></td>
-                        <td class="variable1" data-campo="exam_m25"></td>
-                        <td id="cm25" class="variable1">Menos del 25%</td>
-                        <td class="variable1" data-campo="alumnos_m25"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+table a {
+    color: #003cff;
+}
 
-        <!-- Cuadro 2 -->
-        <div class="caja-scroll">
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="constante1">Fecha 50%</td>
-                        <td id="fecha-50" class="variable1"></td>
-                        <td class="constante1">Fecha 75%</td>
-                        <td id="fecha-75" class="variable1"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+table {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-collapse: collapse;
+}
 
-        <!-- Cuadro 3 -->
+td {
+    padding: 6px 10px;
+    border: 1px solid var(--color-borde);
+    text-align: center;
+    font-size: 14px;
+    background-color: var(--color-blanco);
+}
 
-        <div class="caja-scroll">
-            <table>
-                <tbody>
-                    <tr>
-                        <!--<td class="constante1">Última Actualización</td>
-                        <td>Responsable 08-09-2026 11:02</td>
-                        <td><a href="#" target="_blank">Ver en Moodle</a></td>-->
-                        <td><a id="btn-descargar-excel" style="cursor: pointer; color: #003cff; text-decoration: underline;">Descargar Excel</a></td>
-                        <!--<td><a href="#" target="_blank" type="button">Ver Calendario</a></td>
-                        <td><a href="#" target="_blank" type="button">Editar Calendario</a></td>
-                        <td><a href="#" target="_blank" type="button">Actualizar informe</a></td>
-                    --></tr>
-                </tbody>
-            </table>
-        </div>
+.constante1, #avanzados, #rezagados, #nalumnos, #totalalumnos {
+    white-space: nowrap;
+    padding: 6px 12px;
+}
 
-        <h1 class="no-imprimir"><small>Formulario</small></h1>
+.variable1 {
+    background-color: var(--color-blanco);
+    color: var(--color-negro);
+    min-width: 90px;
+    box-sizing: border-box;
+}
 
-        <!-- Formulario -->
-        <div class="caja-scroll no-imprimir">
-            <form action="index.html" method="post" id="form-edicion">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="constante1">ID Guía</td>
-                            <td class="variable1"><input type="text" data-campo="idguia" aria-label="ID Guía" placeholder="ID Guía"></td>
-                            <td class="constante1">Nombre de Curso</td>
-                            <td class="variable1"><input type="text" data-campo="nombre" aria-label="Nombre del curso" placeholder="Nombre del curso"></td>
-                            <td class="constante1">Nº de Exámenes</td>
-                            <td class="variable1"><input type="number" data-campo="examenes" aria-label="Nº de Exámenes Total" placeholder="Total" min="0"></td>
-                            <td class="constante1">Nº de Alumnos</td>
-                            <td class="constante1">MAX.ALUMNOS SUBVENCIONABLES</td>
-                            <td class="variable1"><input type="number" data-campo="maxsub" aria-label="Máximo alumnos subvencionables" placeholder="Máx. Subv." min="0"></td>
-                            <td class="constante1">Evaluación referencia a<br><span class="fecha-eval-actual"></span></td>
-                            <td class="variable1"><input type="number" data-campo="referencia" aria-label="Evaluación de referencia" placeholder="Ref." min="0"></td>
-                        </tr>
+table input {
+    width: 100%;
+    min-width: 75px;
+    border: none;
+    outline: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+}
 
-                        <tr>
-                            <td class="constante1">Fecha Inicio</td>
-                            <td class="variable1"><input type="date" data-campo="fechainicio" aria-label="Fecha de Inicio"></td>
-                            <td class="constante1">Tutor</td>
-                            <td class="variable1"><input type="text" data-campo="tutor" aria-label="Nombre del Tutor" placeholder="Tutor"></td>
-                            <td class="variable1"><input type="number" data-campo="exam_75100" aria-label="Exámenes 75% - 100%" placeholder="Exámen" readonly tabindex="-1"></td>
-                            <td class="variable1" style="background-color: var(--color-verde-claro); font-weight: bold;">75% - 100%</td>
-                            <td class="variable1"><input type="number" data-campo="alumnos_75100" aria-label="Alumnos 75% - 100%" placeholder="Alumnos" min="0"></td>
-                            <td class="constante1">15% Desvío</td>
-                            <td class="variable1"><input type="number" data-campo="desvio" aria-label="15% Desvío" placeholder="Desvío" readonly tabindex="-1"></td>
-                            <td style="background-color: var(--color-verde); font-weight: bold;">Alumnos avanzados</td>
-                            <td class="variable1"><input type="number" data-campo="avanzados" aria-label="Alumnos avanzados" placeholder="Alumnos" min="0"></td>
-                        </tr>
+table input:focus {
+    background-color: var(--color-focus);
+}
 
-                        <tr>
-                            <td class="constante1">Fecha Fin</td>
-                            <td class="variable1"><input type="date" data-campo="fechafin" aria-label="Fecha de Fin"></td>
-                            <td class="constante1">Horario Tutoría</td>
-                            <td class="variable1"><input type="text" data-campo="tutoria" aria-label="Horario de Tutoría" placeholder="13:00 - 16:00"></td>
-                            <td class="variable1"><input type="number" data-campo="exam_50" aria-label="Exámenes 50%" placeholder="Exámen" readonly tabindex="-1"></td>
-                            <td class="variable1" style="background-color: var(--color-naranja); font-weight: bold;">50%</td>
-                            <td class="variable1"><input type="number" data-campo="alumnos_50" aria-label="Alumnos 50%" placeholder="Alumnos" min="0"></td>
-                            <td class="constante1">Alumnos subvencionables</td>
-                            <td class="variable1"><input type="number" data-campo="subvencionables" aria-label="Alumnos subvencionables" placeholder="Subv." min="0"></td>
-                            <td style="background-color: var(--color-rojo); font-weight: bold;">Alumnos rezagados</td>
-                            <td class="variable1"><input type="number" data-campo="rezagados" aria-label="Alumnos rezagados" placeholder="Rezag." min="0"></td>
-                        </tr>
+.constante1 {
+    background-color: var(--color-primario);
+    color: var(--color-fondo-pagina);
+    font-weight: bold;
+}
 
-                        <tr>
-                            <td class="constante1">Horas</td>
-                            <td class="variable1"><input type="number" data-campo="horas" aria-label="Horas" placeholder="Horas" min="0"></td>
-                            <td class="constante1">Dinamizador</td>
-                            <td class="variable1"><input type="text" data-campo="dinamizador" aria-label="Dinamizador" placeholder="Dinamizador"></td>
-                            <td class="variable1"><input type="number" data-campo="exam_25" aria-label="Exámenes 25%" placeholder="Exámen" readonly tabindex="-1"></td>
-                            <td class="variable1" style="background-color: var(--color-amarillo); font-weight: bold;">25%</td>
-                            <td class="variable1"><input type="number" data-campo="alumnos_25" aria-label="Alumnos 25%" placeholder="Alumnos" min="0"></td>
-                            <td class="variable1" style="background-color: var(--color-azul-claro); font-weight: bold;" rowspan="2">Total alumnos</td>
-                            <td class="variable1" rowspan="2"><input type="number" data-campo="total" aria-label="Total alumnos" placeholder="Total" min="0"></td>
-                            <td class="sinborde" colspan="2" rowspan="2"></td>
-                        </tr>
+#avanzados { background-color: var(--color-verde); font-weight: bold; }
+#rezagados { background-color: var(--color-rojo); font-weight: bold; }
+#cantexam { background-color: var(--color-rosa-fuerte); }
+#nalumnos { font-weight: bold; }
+#totalalumnos { background-color: var(--color-azul-claro); font-weight: bold; }
+#c75100 { background-color: var(--color-verde-claro); font-weight: bold; }
+#c50 { background-color: var(--color-naranja); font-weight: bold; }
+#c25 { background-color: var(--color-amarillo); font-weight: bold; }
+#cm25 { background-color: var(--color-rosa-claro); font-weight: bold; }
 
-                        <tr>
-                            <td class="constante1">25% de matriculación</td>
-                            <td class="variable1"><input type="date" data-campo="matriculacion" aria-label="Fecha 25% de matriculación"></td>
-                            <td class="constante1">25% de conexión</td>
-                            <td class="variable1"><input type="date" data-campo="conexion" aria-label="Fecha 25% de conexión"></td>
-                            <td class="variable1"><input type="number" data-campo="exam_m25" aria-label="Exámenes menos del 25%" placeholder="Exámen" readonly tabindex="-1"></td>
-                            <td class="variable1" style="background-color: var(--color-rosa-claro); font-weight: bold;">Menos del 25%</td>
-                            <td class="variable1"><input type="number" data-campo="alumnos_m25" aria-label="Alumnos menos del 25%" placeholder="Alumnos" min="0"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="contenedor-boton">
-                    <span id="mensaje-error" style="color: red; margin-right: 15px; font-weight: bold; display: none;"></span>
-                    <button type="submit" id="botonguardar">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
+.sinborde {
+    border: none !important;
+    background-color: transparent !important;
+}
 
-        <!-- Barra Desplegable: Tabla de Seguimiento -->
-<div class="acordeon-seccion">
-    <!-- Encabezado clicable -->
-    <div class="acordeon-header" id="btn-acordeon">
-        <span>Tabla Seguimiento</span>
-        <span class="acordeon-icono">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </span>
-    </div>
+form {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
 
-    <!-- Contenido que se despliega -->
-    <div class="acordeon-contenido" id="contenido-acordeon">
-        <!-- Barra de herramientas superior -->
-        <div class="barra-herramientas">
-            <div class="herramientas-izq">
-                <span class="rango-paginacion" id="contador-alumnos">1 - 13</span>
+.contenedor-boton {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#botonguardar {
+    padding: 8px 16px;
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#botonguardar:hover {
+    background-color: #2b5074;
+}
+
+/* Estilos Toast */
+.alertaguardado {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+}
+
+.alertaguardado.mostrar {
+    visibility: visible;
+    bottom: 50px;
+    opacity: 1;
+}
+
+/* Estilo para campos calculados automáticamente */
+table input[readonly] {
+    background-color: #f9f9f9;
+    color: #555555;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Animación de destello visual para celdas modificadas */
+@keyframes destelloActualizacion {
+    0% {
+        background-color: #c8e6c9; /* Verde claro pastel */
+        box-shadow: inset 0 0 4px #4caf50;
+    }
+    100% {
+        background-color: var(--color-blanco);
+        box-shadow: none;
+    }
+}
+
+.celda-actualizada {
+    animation: destelloActualizacion 1.5s ease-out;
+}
+
+/* --- ESTILOS DE IMPRESIÓN Y PDF (@media print) --- */
+@media print {
+    .no-imprimir {
+        display: none !important;
+    }
+
+    body {
+        background-color: #ffffff !important;
+        font-size: 12pt;
+    }
+
+    .contenedor-principal {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .caja-scroll {
+        overflow: visible !important;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    td {
+        padding: 4px 8px;
+        font-size: 10pt;
+    }
+}
+
+/* --- COMPONENTE DESPLEGABLE (ACORDEÓN) --- */
+.acordeon-seccion {
+    width: 100%;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: var(--color-blanco);
+    overflow: hidden;
+}
+
+.acordeon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background-color: var(--color-blanco);
+    color: #1f2937;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.acordeon-header:hover {
+    background-color: #f9fafb;
+}
+
+/* Estado activo (abierto) */
+.acordeon-header.abierto {
+    background-color: #cde1ff;
+    border-bottom-color: #93c5fd;
+    color: #1e3a8a;
+}
+
+.acordeon-icono {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.acordeon-header.abierto .acordeon-icono {
+    transform: rotate(180deg);
+}
+
+.acordeon-contenido {
+    display: none;
+    padding: 12px;
+    background-color: #ffffff;
+}
+
+.acordeon-contenido.mostrar {
+    display: block;
+}
+
+/* Barra superior interna */
+.barra-herramientas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.herramientas-izq, .herramientas-der {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rango-paginacion {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.select-grupos {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    background-color: #fff;
+}
+
+.btn-asignar {
+    background-color: #0066ff;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.btn-asignar:hover {
+    background-color: #0052cc;
+}
+
+.caja-buscar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icono-buscar {
+    position: absolute;
+    left: 10px;
+    color: #9ca3af;
+}
+
+.caja-buscar input {
+    padding: 6px 12px 6px 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    font-size: 13px;
+    width: 180px;
+    outline: none;
+}
+
+.caja-buscar input:focus {
+    border-color: #0066ff;
+}
+
+/* Tabla de seguimiento */
+.caja-scroll-seguimiento {
+    overflow-x: auto;
+    width: 100%;
+    border: 1px solid #e5e7eb;
+}
+
+.tabla-seguimiento {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.tabla-seguimiento th {
+    background-color: #ffffff;
+    font-weight: 700;
+    padding: 8px 6px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.tabla-seguimiento td {
+    padding: 6px 8px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+/* Colores de celdas según diseño */
+.col-verde-pastel {
+    background-color: #a7d3b7 !important;
+}
+
+.col-rosa-pastel {
+    background-color: #f7d7d7 !important;
+}
+
+.col-estado-finalizado {
+    background-color: #a8d582 !important;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.link-alumno {
+    color: #0066ff;
+    font-weight: 600;
+}
+
+.link-tel, .link-mail {
+    color: #0066ff;
+    text-decoration: underline;
+}
 
 
-                <!-- <select class="select-grupos">
-                    <option>Grupos disponibles del curso</option>
-                </select>
-                <button type="button" class="btn-asignar">Asignar</button>
-            </div>
-            <div class="herramientas-der"> -->
+/* Interruptores Toggle (P.ECO) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    border-radius: 18px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+    background-color: #4ade80;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+/* Estilo para celdas editables al hacer clic en ellas */
+td[contenteditable="true"]:focus, a[contenteditable="true"]:focus {
+    outline: 2px solid #0066ff;
+    background-color: #f0f7ff !important;
+    color: #000;
+}
 
 
-            <div class="herramientas-der">
-                <div class="caja-buscar">
-                    <svg class="icono-buscar" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                <input type="text" id="buscador-alumnos" placeholder="Buscar...">
-            </div>
-            </div>
-        </div>
+/* Asegura espacio suficiente para hacer clic aunque la celda esté vacía */
+a[contenteditable="true"] {
+    display: inline-block;
+    min-width: 80px;
+    min-height: 18px;
+    vertical-align: middle;
+}
 
+/* Estilo limpio para el selector de S. Laboral */
+.select-laboral {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    text-align: center;
+    text-align-last: center; /* Centra el texto de la opción elegida */
+    cursor: pointer;
+    width: 100%;
+    color: var(--color-negro);
+    /* Opcional: Para ocultar la flechita predeterminada del navegador y que se vea solo texto */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
-        <!-- Tabla de alumnos -->
-        <div class="caja-scroll-seguimiento">
-            <table class="tabla-seguimiento" id="tabla-alumnos">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="check-maestro" checked></th>
-                        <th>Apellidos</th>
-                        <th>Nombre</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
-                        <th>S. Laboral</th>
-                        <th>1ª Conexión</th>
-                        <th>Última Conexión</th>
-                        <th>Conexión Total</th>
-                        <th>P.ECO 1<br><small>Cuestionario</small></th>
-                        <th>P.ECO 2<br><small>Subida archivo</small></th>
-                        <th>P.ECO 3<br><small>Correo</small></th>
-                        <th>P.ECO 4<br><small>Foro</small></th>
-                        <th>Observaciones Responsable</th>
-                        <th>Observaciones Tutor</th>
-                        <th>Ev.<br>Realizadas</th>
-                        <th>Contenidos</th>
-                        <th>Nota<br>Final</th>
-                        <th>Tipo Alumno</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1. <input type="checkbox" class="check-alumno"></td>
-                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
-                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
-                        <td>
-                            <a href="#" target="_blank" class="link-tel" contenteditable="true" data-tipo="tel"></a>
-                        </td>
-                        <td>
-                            <a href="#" class="link-mail" contenteditable="true" data-tipo="email"></a>
-                        </td>
-                        <td>
-                            <select class="select-laboral">
-                                <option value="Ocu">Ocu</option>
-                                <option value="Des">Des</option>
-                            </select>
-                        </td>
-                        <td class="col-rosa-pastel" contenteditable="true"></td>
-                        <td class="col-rosa-pastel" contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td class="celda-observacion"></td> <!-- Esta es Responsable -->
-                        <td class="celda-observacion"></td> <!-- Esta es Tutor -->
-                        <td class="col-verde-pastel" contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <!-- Reemplaza la última celda por este select -->
-                        <td class="col-estado-finalizado">
-                            <select class="select-tipo-alumno">
-                                <option value="FINALIZADO">FINALIZADO</option>
-                                <option value="REZAGADO">REZAGADO</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2. <input type="checkbox" class="check-alumno"></td>
-                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
-                        <td class="col-verde-pastel link-alumno" contenteditable="true"></td>
-                        <td>
-                            <a href="#" target="_blank" class="link-tel" contenteditable="true" data-tipo="tel"></a>
-                        </td>
-                        <td>
-                            <a href="#" class="link-mail" contenteditable="true" data-tipo="email"></a>
-                        </td>
-                        <td>
-                            <select class="select-laboral">
-                                <option value="Ocu">Ocu</option>
-                                <option value="Des">Des</option>
-                            </select>
-                        </td>
-                        <td class="col-rosa-pastel" contenteditable="true"></td>
-                        <td class="col-rosa-pastel" contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td><label class="switch"><input type="checkbox" ><span class="slider"></span></label></td>
-                        <td class="celda-observacion"></td> <!-- Esta es Responsable -->
-                        <td class="celda-observacion"></td> <!-- Esta es Tutor -->
-                        <td class="col-verde-pastel" contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <td contenteditable="true"></td>
-                        <!-- Reemplaza la última celda por este select -->
-                        <td class="col-estado-finalizado">
-                            <select class="select-tipo-alumno">
-                                <option value="FINALIZADO">FINALIZADO</option>
-                                <option value="REZAGADO">REZAGADO</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+.select-laboral:focus {
+    background-color: #f0f7ff;
+}
 
-        <!-- Botones para gestionar filas de alumnos -->
-        <div style="margin-top: 10px; text-align: left; display: flex; gap: 8px;">
-            <button type="button" id="btn-agregar-alumno" style="background-color: var(--color-primario); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                + Añadir Alumno
-            </button>
-            <button type="button" id="btn-eliminar-alumno" style="background-color: var(--color-rojo); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                - Eliminar Alumno
-            </button>
-        </div>
-    </div>
-</div>
+/* --- ANIMACIÓN AL PASAR EL RATÓN (ZOOM OBSERVACIONES) --- */
+.celda-observacion {
+    max-width: 150px;
+    height: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left !important;
+    font-size: 11px;
+    background-color: #9ecc86; /* Sin !important para que JavaScript pueda cambiarlo */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    z-index: 1;
+}
 
-    </div>
+.celda-observacion:hover {
+    transform: scale(1.1); /* Agranda el cuadro */
+    z-index: 10; /* Lo pone por encima de las otras celdas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Añade sombra */
+    border: 2px solid #8cb4ff !important; /* Borde azul redondeado */
+    border-radius: 6px;
+    white-space: normal; /* Permite ver un poco más de texto al agrandar */
+    max-height: 80px;
+    overflow-y: auto;
+}
 
-    <!-- Ventana Modal para Observaciones -->
-    <div id="modal-observaciones" class="modal-overlay oculto no-imprimir">
-        <div class="modal-contenido">
-            <div class="modal-header">
-                <h2 id="modal-titulo">OBSERVACIONES</h2>
-                <div class="modal-controles">
-                    <div style="display: flex; flex-direction: column; font-size: 12px; font-weight: bold;">
-                        <label for="modal-color">Seleccione un Color</label>
-                        <select id="modal-color">
-                            <option value="#9ecc86" style="background-color: #9ecc86;">Verde</option>
-                            <option value="#f8f669" style="background-color: #f8f669;">Amarillo</option>
-                            <option value="#fdd3d3" style="background-color: #fdd3d3;">Rosa</option>
-                            <option value="#ffffff" style="background-color: #ffffff;">Blanco</option>
-                        </select>
-                    </div>
-                    <span class="cerrar-modal" id="btn-cerrar-x">&times;</span>
-                </div>
-            </div>
-            <textarea id="modal-textarea" rows="8"></textarea>
-            <div class="modal-footer">
-                <button type="button" id="btn-cancelar-modal" class="btn-cancelar">Cancelar</button>
-                <button type="button" id="btn-guardar-modal" class="btn-guardar">Guardar</button>
-            </div>
-        </div>
-    </div>
+/* --- VENTANA MODAL (POPUP OBSERVACIONES) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    <!-- Notificación Toast -->
-    <div id="alertaguardado" class="alertaguardado no-imprimir">Cambios guardados con éxito</div>
+.modal-overlay.oculto {
+    display: none !important;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+.modal-contenido {
+    background-color: var(--color-blanco);
+    padding: 20px;
+    border-radius: 8px;
+    width: 600px;
+    max-width: 95%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-titulo {
+    font-size: 16px;
+    margin: 0;
+    color: #333;
+}
+
+.modal-controles {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#modal-color {
+    padding: 6px 12px;
+    border: 1px solid #b0b0b0;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 140px;
+}
+
+.cerrar-modal {
+    cursor: pointer;
+    font-size: 24px;
+    color: #888;
+    line-height: 1;
+}
+
+.cerrar-modal:hover { color: #000; }
+
+#modal-textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#modal-textarea:focus { border-color: #0066ff; }
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+.btn-cancelar {
+    background: transparent;
+    color: #0066ff;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-guardar {
+    background-color: #0066ff;
+    color: white;
+    border: none;
+    padding: 8px 30px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-guardar:hover { background-color: #0052cc; }
+
+/* Estilo limpio para el selector de Tipo Alumno */
+.select-tipo-alumno {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    text-align-last: center; /* Centra el texto de la opción elegida */
+    cursor: pointer;
+    width: 100%;
+    color: var(--color-negro);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.select-tipo-alumno:focus {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Color rojo para alumnos rezagados */
+.col-estado-rezagado {
+    background-color: #ff8c8c !important; /* Rojo pastel */
+    font-weight: bold;
+    font-size: 11px;
+}
+
+/* --- ESTILOS DE LA PÁGINA DE LOGIN --- */
+.contenedor-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.tarjeta-login {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    padding: 35px 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.tarjeta-login h2 {
+    margin: 0 0 8px 0;
+    color: var(--color-primario);
+    font-size: 24px;
+}
+
+.subtitulo-login {
+    margin: 0 0 25px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.grupo-campo {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.grupo-campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.grupo-campo input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.grupo-campo input:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(60, 110, 156, 0.15);
+}
+
+.btn-principal-login {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.btn-principal-login:hover {
+    background-color: #2b5074;
+}
+
+.acciones-secundarias-login {
+    margin-top: 20px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.enlace-secundario {
+    color: #003cff;
+    text-decoration: none;
+}
+
+.enlace-secundario:hover {
+    text-decoration: underline;
+}
+
+.separador {
+    color: #aaa;
+}
+
+.alerta-error {
+    background-color: var(--color-rosa-claro);
+    color: #b91c1c;
+    border: 1px solid #f87171;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 13px;
+    margin-bottom: 15px;
+    text-align: left;
+}
