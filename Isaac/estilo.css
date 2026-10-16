@@ -1,0 +1,113 @@
+/* 1. Reinicio global */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 2. Fondo y centrado de pantalla */
+body {
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* 3. Tarjeta contenedora */
+main {
+    width: 100%;
+    max-width: 420px;
+}
+
+section {
+    background-color: #ffffff;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* 4. Textos y Encabezados */
+h1 {
+    color: #1a1a1a;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+section > p {
+    color: #666666;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* 5. Estilos de todos los campos de entrada */
+form div {
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444444;
+    margin-bottom: 6px;
+}
+
+/* Aplica el estilo a TODOS los tipos de input que usas */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efecto de enfoque azul al hacer clic en cualquier input */
+input:focus {
+    border-color: #8198af;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+}
+
+/* 6. Botones de envío */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #6fb484;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #0052a3;
+}
+
+/* 7. Separador y enlaces de navegación */
+hr {
+    border: none;
+    border-top: 1px solid #eeeeee;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
