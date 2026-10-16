@@ -3,45 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Acceso al sistema - Académica Colón</title>
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-
-    <div id="header">
-        <a href="" target="_blank"><img src="logo.webp" alt="Logo Académica Colón" width="150px"></a>
+    <div id="header" class="no-imprimir">
+        <a href="index.html"><img src="logo.webp" alt="Logo Académica Colón" width="150px"></a>
         <a href="" target="_blank">Inicio</a>
         <a href="" target="_blank">Portales</a>
         <a href="" target="_blank">Gestionar cursos</a>
         <a href="" target="_blank">Aula Virtual</a>
-        <a href="" target="_blank">📤</a>
     </div>
 
-    <h1>Login</h1>
+    <main class="contenedor-login">
+        <div class="tarjeta-login">
+            <h2 id="titulo-auth">Iniciar Sesión</h2>
+            <p class="subtitulo-login" id="subtitulo-auth">Introduce tus credenciales para acceder</p>
 
-    <div class="contenedor-principal">
-        <div class="caja-scroll">
-            <form action="index.html" method="post">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="constante1">Usuario</td>
-                            <td class="variable1"><input type="text" name="usuario" placeholder="Usuario"></td>
-                            <td class="constante1">Contraseña</td>
-                            <td class="variable1"><input type="password" name="contrasena" placeholder="Contraseña"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="contenedor-boton">
-                    <button type="submit" id="botonlogin">Login</button>
+            <!-- Cambiamos a form estático, la redirección la hará JS -->
+            <form id="form-auth" onsubmit="event.preventDefault();">
+                <div id="login-error" class="alerta-error" style="display: none;"></div>
+
+                <div class="grupo-campo">
+                    <label for="usuario">Correo electrónico</label>
+                    <input type="email" id="usuario" placeholder="Ej. usuario@dominio.com" autocomplete="username" required>
                 </div>
-                <div class="contenedor-boton">
-                    <button type="button" id="botonregistro">Registro</button>
-                    <button type="button" id="botonlogout">Logout</button>
+
+                <div class="grupo-campo">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" placeholder="••••••••" autocomplete="current-password" required minlength="6">
+                </div>
+
+                <button type="submit" id="botonlogin" class="btn-principal-login">Entrar</button>
+
+                <div class="acciones-secundarias-login">
+                    <span id="texto-alternativo">¿No tienes cuenta?</span>
+                    <a href="#" class="enlace-secundario" id="btn-cambiar-modo">Regístrate</a>
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 
+    <!-- MÓDULOS DE FIREBASE -->
+    <script type="module">
+        // Importar las funciones que necesitas desde los SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+        // TODO: SUSTITUYE ESTE OBJETO POR EL TUYO (Paso 1.5)
+        const firebaseConfig = {
+            apiKey: "AIzaSyTU_CLAVE_AQUI",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdefg"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Lógica de la interfaz
+        let modoLogin = true; 
+        const titulo = document.getElementById('titulo-auth');
+        const subtitulo = document.getElementById('subtitulo-auth');
+        const btnAccion = document.getElementById('botonlogin');
+        const btnCambiarModo = document.getElementById('btn-cambiar-modo');
+        const textoAlternativo = document.getElementById('texto-alternativo');
+        const alertaError = document.getElementById('login-error');
+        const formAuth = document.getElementById('form-auth');
+
+        // Alternar entre Login y Registro
+        btnCambiarModo.addEventListener('click', (e) => {
+            e.preventDefault();
+            modoLogin = !modoLogin;
+            alertaError.style.display = 'none';
+
+            if (modoLogin) {
+                titulo.textContent = 'Iniciar Sesión';
+                subtitulo.textContent = 'Introduce tus credenciales para acceder';
+                btnAccion.textContent = 'Entrar';
+                textoAlternativo.textContent = '¿No tienes cuenta?';
+                btnCambiarModo.textContent = 'Regístrate';
+            } else {
+                titulo.textContent = 'Registro';
+                subtitulo.textContent = 'Crea una cuenta nueva';
+                btnAccion.textContent = 'Crear cuenta';
+                textoAlternativo.textContent = '¿Ya tienes cuenta?';
+                btnCambiarModo.textContent = 'Inicia sesión';
+            }
+        });
+
+        // Enviar formulario (Conexión a Firebase)
+        formAuth.addEventListener('submit', () => {
+            const email = document.getElementById('usuario').value.trim();
+            const pass = document.getElementById('contrasena').value.trim();
+
+            btnAccion.disabled = true;
+            btnAccion.textContent = 'Procesando...';
+
+            if (modoLogin) {
+                // Iniciar sesión
+                signInWithEmailAndPassword(auth, email, pass)
+                    .then((userCredential) => {
+                        window.location.href = "index.html"; // Redirigir si hay éxito
+                    })
+                    .catch((error) => {
+                        alertaError.style.display = 'block';
+                        alertaError.textContent = "Error: Correo o contraseña incorrectos.";
+                        btnAccion.disabled = false;
+                        btnAccion.textContent = 'Entrar';
+                    });
+            } else {
+                // Registrar usuario
+                createUserWithEmailAndPassword(auth, email, pass)
+                    .then((userCredential) => {
+                        alert("Cuenta creada con éxito. Iniciando sesión...");
+                        window.location.href = "index.html"; // Redirigir si hay éxito
+                    })
+                    .catch((error) => {
+                        alertaError.style.display = 'block';
+                        alertaError.textContent = "Error: " + error.message; // Firebase dirá si el correo ya existe, es inválido, etc.
+                        btnAccion.disabled = false;
+                        btnAccion.textContent = 'Crear cuenta';
+                    });
+            }
+        });
+    </script>
 </body>
+</html>
