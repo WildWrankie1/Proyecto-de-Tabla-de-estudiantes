@@ -17,12 +17,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Helper para convertir IDs con barras (ej: 25/2846) en nombres válidos para Firestore
+// Helper para convertir IDs con caracteres especiales en claves válidas para Firestore
 const normalizarIdDoc = (id) => encodeURIComponent(id.trim().toUpperCase());
 
 let cursoActualId = null;
 
-// Helper para destello visual
+// Helper para destello visual de celdas actualizadas
 const animarElemento = (elemento) => {
     if (!elemento) return;
     elemento.classList.remove('celda-actualizada');
@@ -31,7 +31,7 @@ const animarElemento = (elemento) => {
     setTimeout(() => elemento.classList.remove('celda-actualizada'), 1500);
 };
 
-// 3. GUARDIÁN DE RUTA Y CARGA AUTOMÁTICA
+// 3. GUARDIÁN DE RUTA
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = "login.html";
@@ -54,12 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fecha actual
+    // Fecha actual formateada DD-MM-AA
     const hoy = new Date();
     const fechaActualFormateada = `${String(hoy.getDate()).padStart(2, '0')}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getFullYear()).slice(-2)}`;
     document.querySelectorAll('.fecha-eval-actual').forEach(el => el.textContent = fechaActualFormateada);
 
     const form = document.getElementById('form-edicion');
+
+    // --- PREVENIR GUARDADO ACCIDENTAL CON LA TECLA ENTER ---
+    form.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+            e.preventDefault(); // Evita que se envíe el formulario
+            e.target.blur();    // Quita el foco para que se dispare la búsqueda del ID
+        }
+    });
+
     const toast = document.getElementById('alertaguardado');
     const mensajeError = document.getElementById('mensaje-error');
     const tablaAlumnos = document.getElementById('tabla-alumnos');
@@ -70,16 +79,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tablaAlumnos) return;
         
         const filas = tablaAlumnos.querySelectorAll('tbody tr');
-        const total = filas.length;
+        let totalReales = 0;
         let finalizados = 0;
         let rezagados = 0;
 
-        // Contar el estado de cada alumno
+        // Contar el estado solo de las filas que tienen datos reales
         filas.forEach(fila => {
-            const select = fila.querySelector('.select-tipo-alumno');
-            if (select) {
-                if (select.value === 'FINALIZADO') finalizados++;
-                else if (select.value === 'REZAGADO') rezagados++;
+            const c = fila.querySelectorAll('td');
+            if (c.length < 19) return;
+
+            const apellidos = c[1].innerText.trim();
+            const nombre = c[2].innerText.trim();
+            const email = c[4].innerText.trim();
+
+            // Consideramos que la fila tiene a un "alumno real" si al menos tiene un dato de estos tres
+            if (apellidos !== '' || nombre !== '' || (email !== '' && email !== 'escribe...')) {
+                totalReales++;
+
+                const select = fila.querySelector('.select-tipo-alumno');
+                if (select) {
+                    if (select.value === 'FINALIZADO') finalizados++;
+                    else if (select.value === 'REZAGADO') rezagados++;
+                }
             }
         });
 
@@ -89,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputRezagados = form.querySelector('input[data-campo="rezagados"]');
 
         if (inputTotal) {
-            inputTotal.value = total;
+            inputTotal.value = totalReales;
             // Disparamos el evento para que recalcule automáticamente el "15% Desvío"
             inputTotal.dispatchEvent(new Event('input')); 
         }
@@ -101,22 +122,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const celdaAvanzados = document.querySelector('.caja-scroll table [data-campo="avanzados"]');
         const celdaRezagados = document.querySelector('.caja-scroll table [data-campo="rezagados"]');
 
-        if (celdaTotal) celdaTotal.textContent = total;
+        if (celdaTotal) celdaTotal.textContent = totalReales;
         if (celdaAvanzados) celdaAvanzados.textContent = finalizados;
         if (celdaRezagados) celdaRezagados.textContent = rezagados;
     };
 
-    // --- LÓGICA DEL BOTÓN "+ NUEVO CURSO" (LIMPIAR TODO) ---
-    const btnNuevoCurso = document.getElementById('btn-nuevo-curso');
-
-    const resetearFormularioYTabla = () => {
-        // 1. Resetear inputs del formulario
+    // --- LÓGICA DE RESETEO Y NUEVO CURSO ---
+    const resetearFormularioYTabla = (mantenerId = false) => {
+        const idActual = inputIdGuia ? inputIdGuia.value : '';
         form.reset();
-        cursoActualId = null;
-        localStorage.removeItem('ultimoCursoActivo');
         mensajeError.style.display = 'none';
 
-        // 2. Limpiar las celdas de los Cuadros 1 y 2
+        if (mantenerId && inputIdGuia) {
+            inputIdGuia.value = idActual;
+            cursoActualId = idActual;
+        } else {
+            cursoActualId = null;
+            localStorage.removeItem('ultimoCursoActivo');
+        }
+
         document.querySelectorAll('.caja-scroll table [data-campo]').forEach(celda => {
             celda.textContent = '';
         });
@@ -125,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (c50) c50.textContent = '';
         if (c75) c75.textContent = '';
 
-        // 3. Reiniciar la tabla de alumnos a 2 filas vacías por defecto
         const tbody = tablaAlumnos.querySelector('tbody');
         if (tbody) {
             tbody.innerHTML = window.crearFilaHTML(1) + window.crearFilaHTML(2);
@@ -133,19 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarContadorAlumnos();
         window.sincronizarTotales();
 
-        // 4. Enfocar el cursor en ID Guía
-        if (inputIdGuia) inputIdGuia.focus();
+        if (!mantenerId && inputIdGuia) inputIdGuia.focus();
     };
 
+    const btnNuevoCurso = document.getElementById('btn-nuevo-curso');
     if (btnNuevoCurso) {
         btnNuevoCurso.addEventListener('click', () => {
             if (confirm("¿Deseas vaciar la pantalla para registrar un nuevo curso?")) {
-                resetearFormularioYTabla();
+                resetearFormularioYTabla(false);
             }
         });
     }
 
-    // Buscar curso al escribir en ID Guía
+    // --- BÚSQUEDA Y PREVENCIÓN DE SOBREESCRITURA ACCIDENTAL ---
     if (inputIdGuia) {
         inputIdGuia.addEventListener('blur', async (e) => {
             const idBuscado = e.target.value.trim().toUpperCase();
@@ -166,6 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         e.target.value = cursoActualId || '';
                     }
                 } else {
+                    // Si el curso es nuevo y teníamos datos de otro en pantalla, reseteamos manteniendo el nuevo ID
+                    if (cursoActualId && cursoActualId !== idBuscado) {
+                        resetearFormularioYTabla(true);
+                    }
                     cursoActualId = idBuscado;
                     localStorage.setItem('ultimoCursoActivo', idBuscado);
                 }
@@ -175,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mapear campos
+    // Mapeo de campos del formulario
     const inputExamenes = form.querySelector('input[data-campo="examenes"]');
     const input75100 = form.querySelector('input[data-campo="exam_75100"]');
     const input50 = form.querySelector('input[data-campo="exam_50"]');
@@ -194,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.querySelector('input[data-campo="alumnos_m25"]')
     ];
 
-    // Cálculos de fechas porcentajes
+    // Cálculos de fechas de corte 50% y 75%
     const calcularFechasPorcentajes = (inicioStr, finStr) => {
         if (!inicioStr || !finStr) return null;
         const [yI, mI, dI] = inicioStr.split('-').map(Number);
@@ -212,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return { fecha50: fmt(f50), fecha75: fmt(f75) };
     };
 
-    // Actualizar celdas visuales de la cabecera (Cuadros 1 y 2)
     window.actualizarTablasSuperiores = () => {
         form.querySelectorAll('input[data-campo]').forEach(input => {
             if (input.value.trim() !== '') {
@@ -243,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Cálculos de exámenes
     if (inputExamenes) {
         inputExamenes.addEventListener('input', () => {
             const total = parseInt(inputExamenes.value, 10);
@@ -297,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- GUARDAR EN FIRESTORE MANUALMENTE (AL PULSAR EL BOTÓN) ---
+    // --- GUARDAR EN FIRESTORE MANUALMENTE ---
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         mensajeError.style.display = 'none';
@@ -309,6 +334,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // CAPA DE SEGURIDAD EXTREMA: Evitar pisar cursos no cargados
+        if (idGuiaFinal !== cursoActualId) {
+            try {
+                const docRefTest = doc(db, "cursos", normalizarIdDoc(idGuiaFinal));
+                const snapTest = await getDoc(docRefTest);
+                if (snapTest.exists()) {
+                    mensajeError.textContent = `Error de seguridad: El curso "${idGuiaFinal}" ya existe. No puedes guardar un curso vacío encima. Haz clic fuera de la casilla del ID para cargarlo primero.`;
+                    mensajeError.style.display = 'block';
+                    return; // ABORTAMOS EL GUARDADO
+                }
+            } catch (err) {
+                console.error("Error validando duplicado", err);
+                return;
+            }
+        }
+
         const fIni = form.querySelector('input[data-campo="fechainicio"]').value;
         const fFin = form.querySelector('input[data-campo="fechafin"]').value;
         if (fIni && fFin && new Date(fFin) < new Date(fIni)) {
@@ -317,7 +358,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Recopilar alumnos y validar correos duplicados
+        // Validación de correos duplicados con resaltado prioritario en celdas
+        // ... (Aquí continúa el resto de tu código normal)
+
+        // Validación de correos duplicados con resaltado prioritario en celdas
         const listaAlumnos = [];
         const emailsVistos = new Set();
         let hayEmailDuplicado = false;
@@ -336,8 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     hayEmailDuplicado = true;
                     mensajeError.textContent = `Error: El email "${emailAlumno}" está repetido. Corrige el duplicado antes de guardar.`;
                     mensajeError.style.display = 'block';
-                    fila.style.backgroundColor = '#fee2e2';
-                    setTimeout(() => fila.style.backgroundColor = '', 4000);
+                    
+                    // Resaltar celdas individualmente con !important para vencer a las clases CSS
+                    c.forEach(td => td.style.setProperty('background-color', '#fee2e2', 'important'));
+                    setTimeout(() => {
+                        c.forEach(td => td.style.removeProperty('background-color'));
+                    }, 4000);
                     break;
                 }
                 emailsVistos.add(emailAlumno);
@@ -403,19 +451,21 @@ document.addEventListener('DOMContentLoaded', () => {
         contador.textContent = totalVisibles === 0 ? '0' : `1 - ${totalVisibles}`;
     };
 
+    // Construcción de filas con enlaces condicionales limpios
     window.crearFilaHTML = (num, datos = {}) => {
         const tel = datos.tel || '';
         const email = datos.email || '';
-        const hrefTel = tel.replace(/\D/g, '').length > 5 ? `https://wa.me/34${tel.replace(/\D/g, '')}` : '#';
-        const hrefMail = email.includes('@') ? `mailto:${email}` : '#';
+        const numLimpio = tel.replace(/\D/g, '');
+        const hrefTel = numLimpio.length > 5 ? `https://wa.me/34${numLimpio}` : '';
+        const hrefMail = email.includes('@') ? `mailto:${email}` : '';
         const esRezagado = datos.tipoAlumno === 'REZAGADO';
 
         return `
             <td>${num}. <input type="checkbox" class="check-alumno" ${datos.check !== false ? 'checked' : ''}></td>
             <td class="col-verde-pastel link-alumno" contenteditable="true">${datos.apellidos || ''}</td>
             <td class="col-verde-pastel link-alumno" contenteditable="true">${datos.nombre || ''}</td>
-            <td><a href="${hrefTel}" target="_blank" class="link-tel" contenteditable="true" data-tipo="tel">${tel}</a></td>
-            <td><a href="${hrefMail}" class="link-mail" contenteditable="true" data-tipo="email">${email}</a></td>
+            <td><a ${hrefTel ? `href="${hrefTel}" target="_blank"` : ''} class="link-tel" contenteditable="true" data-tipo="tel">${tel}</a></td>
+            <td><a ${hrefMail ? `href="${hrefMail}"` : ''} class="link-mail" contenteditable="true" data-tipo="email">${email}</a></td>
             <td>
                 <select class="select-laboral">
                     <option value="Ocu" ${datos.sLaboral === 'Ocu' ? 'selected' : ''}>Ocu</option>
@@ -465,22 +515,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Enlaces dinámicos
+    // Enlaces reactivos en edición directa
     tablaAlumnos.addEventListener('input', (e) => {
         const elemento = e.target;
         if (elemento.getAttribute('data-tipo') === 'tel') {
             const limpio = elemento.innerText.replace(/\D/g, '');
-            elemento.href = limpio.length > 5 ? `https://wa.me/34${limpio}` : '#';
+            if (limpio.length > 5) {
+                elemento.href = `https://wa.me/34${limpio}`;
+                elemento.target = "_blank";
+            } else {
+                elemento.removeAttribute('href');
+                elemento.removeAttribute('target');
+            }
         }
         if (elemento.getAttribute('data-tipo') === 'email') {
             const correo = elemento.innerText.trim();
-            elemento.href = correo.includes('@') ? `mailto:${correo}` : '#';
+            if (correo.includes('@')) {
+                elemento.href = `mailto:${correo}`;
+            } else {
+                elemento.removeAttribute('href');
+            }
         }
+
+        window.sincronizarTotales();
     });
 
     tablaAlumnos.addEventListener('click', (e) => {
         if (e.target.tagName === 'A' && e.target.getAttribute('contenteditable') === 'true') {
-            if (!e.ctrlKey) e.preventDefault();
+            // Solo navegar si el enlace existe y se pulsa Ctrl
+            if (!e.target.getAttribute('href') || !e.ctrlKey) {
+                e.preventDefault();
+            }
         }
     });
 
@@ -563,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Tipo Alumno color
+    // Cambio de estado en Tipo Alumno
     tablaAlumnos.addEventListener('change', (e) => {
         if (e.target.classList.contains('select-tipo-alumno')) {
             const celda = e.target.closest('td');
@@ -573,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Buscador
+    // Buscador en tiempo real
     const inputBuscar = document.getElementById('buscador-alumnos') || document.querySelector('.caja-buscar input');
     if (inputBuscar) {
         inputBuscar.addEventListener('input', () => {
@@ -586,13 +651,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Acordeón
+    // Acordeón de tabla
     document.getElementById('btn-acordeon')?.addEventListener('click', function() {
         this.classList.toggle('abierto');
         document.getElementById('contenido-acordeon')?.classList.toggle('mostrar');
     });
 
-    // Exportar CSV
+    // Exportación a Excel CSV
     document.getElementById('btn-descargar-excel')?.addEventListener('click', (e) => {
         e.preventDefault();
         const tablaCurso = document.querySelector('.caja-scroll table');
@@ -619,14 +684,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (c.length < 19) return;
             csv += [
                 idx + 1, c[1].innerText, c[2].innerText, c[3].innerText.replace('💬', '').trim(), c[4].innerText,
-                c[5].querySelector('select')?.value || c[5].innerText,
+                c[5].querySelector('select')?.value || '',
                 c[6].innerText, c[7].innerText, c[8].innerText,
                 c[9].querySelector('input')?.checked ? "SÍ" : "NO",
                 c[10].querySelector('input')?.checked ? "SÍ" : "NO",
                 c[11].querySelector('input')?.checked ? "SÍ" : "NO",
                 c[12].querySelector('input')?.checked ? "SÍ" : "NO",
                 c[13].innerText, c[14].innerText, c[15].innerText, c[16].innerText, c[17].innerText,
-                c[18].querySelector('select')?.value || c[18].innerText
+                c[18].querySelector('select')?.value || ''
             ].map(fmt).join(';') + '\r\n';
         });
 
@@ -639,13 +704,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 5. FUNCIÓN ASÍNCRONA PARA CARGAR DESDE FIRESTORE
+// 5. CARGA PURA EN INTERFAZ
 window.cargarDatosEnInterfaz = function(data) {
     if (!data) return;
 
     const form = document.getElementById('form-edicion');
 
-    // 1. Cargar formulario
     if (data.curso && form) {
         for (const [campo, valor] of Object.entries(data.curso)) {
             const input = form.querySelector(`input[data-campo="${campo}"]`);
@@ -656,7 +720,6 @@ window.cargarDatosEnInterfaz = function(data) {
         }
     }
 
-    // 2. Reconstruir tabla de alumnos
     if (data.alumnos && Array.isArray(data.alumnos)) {
         const tbody = document.querySelector('#tabla-alumnos tbody');
         if (tbody) {
@@ -669,8 +732,7 @@ window.cargarDatosEnInterfaz = function(data) {
             const contador = document.getElementById('contador-alumnos') || document.querySelector('.rango-paginacion');
             if (contador) contador.textContent = `1 - ${data.alumnos.length}`;
             
-            // Refrescar totales basados en la carga
-            if(window.sincronizarTotales) window.sincronizarTotales();
+            if (window.sincronizarTotales) window.sincronizarTotales();
         }
     }
 };
