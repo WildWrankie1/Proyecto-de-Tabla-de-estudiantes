@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-// 2. CONFIGURACIÓN DE FIREBASE (Asegúrate de que tiene tus claves reales)
+// 2. CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyDMG3xErSJVSiZyCIse-epkeVm_53NhWjU",
     authDomain: "tabla-de-estudiantes-ffc91.firebaseapp.com",
@@ -17,17 +17,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Variable para saber qué curso tenemos abierto actualmente
-let cursoActualId = null;
+// Helper para convertir IDs con barras (ej: 25/2846) en nombres válidos para Firestore
+const normalizarIdDoc = (id) => encodeURIComponent(id.trim().toUpperCase());
 
-// 3. GUARDIÁN DE RUTA
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-    } else {
-        console.log("Sesión activa:", user.email);
-    }
-});
+let cursoActualId = null;
 
 // Helper para destello visual
 const animarElemento = (elemento) => {
@@ -38,6 +31,15 @@ const animarElemento = (elemento) => {
     setTimeout(() => elemento.classList.remove('celda-actualizada'), 1500);
 };
 
+// 3. GUARDIÁN DE RUTA Y CARGA AUTOMÁTICA
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        console.log("Sesión activa:", user.email);
+    }
+});
+
 // 4. LÓGICA DE LA PÁGINA
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -46,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
+            localStorage.removeItem('ultimoCursoActivo');
             signOut(auth).then(() => window.location.href = "login.html")
             .catch((error) => console.error("Error al salir", error));
         });
@@ -62,30 +65,109 @@ document.addEventListener('DOMContentLoaded', () => {
     const tablaAlumnos = document.getElementById('tabla-alumnos');
     const inputIdGuia = form.querySelector('input[data-campo="idguia"]');
 
-    // --- LÓGICA DE CARGA AUTOMÁTICA DE CURSO POR ID GUÍA ---
+    // --- FUNCIÓN PARA SINCRONIZAR TABLA DE SEGUIMIENTO CON CUADROS SUPERIORES ---
+    window.sincronizarTotales = () => {
+        if (!tablaAlumnos) return;
+        
+        const filas = tablaAlumnos.querySelectorAll('tbody tr');
+        const total = filas.length;
+        let finalizados = 0;
+        let rezagados = 0;
+
+        // Contar el estado de cada alumno
+        filas.forEach(fila => {
+            const select = fila.querySelector('.select-tipo-alumno');
+            if (select) {
+                if (select.value === 'FINALIZADO') finalizados++;
+                else if (select.value === 'REZAGADO') rezagados++;
+            }
+        });
+
+        // 1. Actualizar los inputs del formulario
+        const inputTotal = form.querySelector('input[data-campo="total"]');
+        const inputAvanzados = form.querySelector('input[data-campo="avanzados"]');
+        const inputRezagados = form.querySelector('input[data-campo="rezagados"]');
+
+        if (inputTotal) {
+            inputTotal.value = total;
+            // Disparamos el evento para que recalcule automáticamente el "15% Desvío"
+            inputTotal.dispatchEvent(new Event('input')); 
+        }
+        if (inputAvanzados) inputAvanzados.value = finalizados;
+        if (inputRezagados) inputRezagados.value = rezagados;
+
+        // 2. Actualizar directamente la tabla visual superior (Cuadro 1)
+        const celdaTotal = document.querySelector('.caja-scroll table [data-campo="total"]');
+        const celdaAvanzados = document.querySelector('.caja-scroll table [data-campo="avanzados"]');
+        const celdaRezagados = document.querySelector('.caja-scroll table [data-campo="rezagados"]');
+
+        if (celdaTotal) celdaTotal.textContent = total;
+        if (celdaAvanzados) celdaAvanzados.textContent = finalizados;
+        if (celdaRezagados) celdaRezagados.textContent = rezagados;
+    };
+
+    // --- LÓGICA DEL BOTÓN "+ NUEVO CURSO" (LIMPIAR TODO) ---
+    const btnNuevoCurso = document.getElementById('btn-nuevo-curso');
+
+    const resetearFormularioYTabla = () => {
+        // 1. Resetear inputs del formulario
+        form.reset();
+        cursoActualId = null;
+        localStorage.removeItem('ultimoCursoActivo');
+        mensajeError.style.display = 'none';
+
+        // 2. Limpiar las celdas de los Cuadros 1 y 2
+        document.querySelectorAll('.caja-scroll table [data-campo]').forEach(celda => {
+            celda.textContent = '';
+        });
+        const c50 = document.getElementById('fecha-50');
+        const c75 = document.getElementById('fecha-75');
+        if (c50) c50.textContent = '';
+        if (c75) c75.textContent = '';
+
+        // 3. Reiniciar la tabla de alumnos a 2 filas vacías por defecto
+        const tbody = tablaAlumnos.querySelector('tbody');
+        if (tbody) {
+            tbody.innerHTML = window.crearFilaHTML(1) + window.crearFilaHTML(2);
+        }
+        actualizarContadorAlumnos();
+        window.sincronizarTotales();
+
+        // 4. Enfocar el cursor en ID Guía
+        if (inputIdGuia) inputIdGuia.focus();
+    };
+
+    if (btnNuevoCurso) {
+        btnNuevoCurso.addEventListener('click', () => {
+            if (confirm("¿Deseas vaciar la pantalla para registrar un nuevo curso?")) {
+                resetearFormularioYTabla();
+            }
+        });
+    }
+
+    // Buscar curso al escribir en ID Guía
     if (inputIdGuia) {
         inputIdGuia.addEventListener('blur', async (e) => {
-            const idBuscado = e.target.value.trim().toUpperCase(); // Forzamos mayúsculas para evitar duplicados por minúsculas
+            const idBuscado = e.target.value.trim().toUpperCase();
             e.target.value = idBuscado;
 
             if (idBuscado === '' || idBuscado === cursoActualId) return;
 
             try {
-                const docRef = doc(db, "cursos", idBuscado);
+                const docRef = doc(db, "cursos", normalizarIdDoc(idBuscado));
                 const snap = await getDoc(docRef);
 
                 if (snap.exists()) {
-                    if (confirm(`El curso con ID Guía "${idBuscado}" ya existe en la base de datos. ¿Deseas cargarlo para editarlo?`)) {
-                        cargarDatosEnInterfaz(snap.data());
+                    if (confirm(`El curso "${idBuscado}" ya existe. ¿Deseas cargarlo para editarlo?`)) {
+                        window.cargarDatosEnInterfaz(snap.data());
                         cursoActualId = idBuscado;
+                        localStorage.setItem('ultimoCursoActivo', idBuscado);
                     } else {
-                        // Si no lo quiere cargar, borramos la casilla para que no lo sobreescriba por error
                         e.target.value = cursoActualId || '';
                     }
                 } else {
-                    // Es un curso nuevo
                     cursoActualId = idBuscado;
-                    console.log("Preparando nuevo curso:", idBuscado);
+                    localStorage.setItem('ultimoCursoActivo', idBuscado);
                 }
             } catch (error) {
                 console.error("Error buscando curso:", error);
@@ -105,9 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputSubvencionables = form.querySelector('input[data-campo="subvencionables"]');
     
     const grupoEstado = [form.querySelector('input[data-campo="avanzados"]'), form.querySelector('input[data-campo="rezagados"]')];
-    const grupoPorcentajes = [input75100, input50, input25, inputM25];
+    const grupoPorcentajes = [
+        form.querySelector('input[data-campo="alumnos_75100"]'),
+        form.querySelector('input[data-campo="alumnos_50"]'),
+        form.querySelector('input[data-campo="alumnos_25"]'),
+        form.querySelector('input[data-campo="alumnos_m25"]')
+    ];
 
-    // Cálculos automáticos de exámenes y fechas
+    // Cálculos de fechas porcentajes
     const calcularFechasPorcentajes = (inicioStr, finStr) => {
         if (!inicioStr || !finStr) return null;
         const [yI, mI, dI] = inicioStr.split('-').map(Number);
@@ -125,6 +212,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return { fecha50: fmt(f50), fecha75: fmt(f75) };
     };
 
+    // Actualizar celdas visuales de la cabecera (Cuadros 1 y 2)
+    window.actualizarTablasSuperiores = () => {
+        form.querySelectorAll('input[data-campo]').forEach(input => {
+            if (input.value.trim() !== '') {
+                const campoNombre = input.getAttribute('data-campo');
+                let valor = input.value.trim();
+                if (input.type === 'date' && valor.includes('-')) {
+                    const partes = valor.split('-');
+                    valor = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+                const celdaDestino = document.querySelector(`.caja-scroll table [data-campo="${campoNombre}"]`);
+                if (celdaDestino && celdaDestino.textContent.trim() !== valor) {
+                    celdaDestino.textContent = valor;
+                    animarElemento(celdaDestino.tagName.toLowerCase() === 'a' ? celdaDestino.parentElement : celdaDestino);
+                }
+            }
+        });
+
+        const fIni = form.querySelector('input[data-campo="fechainicio"]').value;
+        const fFin = form.querySelector('input[data-campo="fechafin"]').value;
+        if (fIni && fFin) {
+            const res = calcularFechasPorcentajes(fIni, fFin);
+            if (res) {
+                const c50 = document.getElementById('fecha-50');
+                const c75 = document.getElementById('fecha-75');
+                if (c50 && c50.textContent !== res.fecha50) { c50.textContent = res.fecha50; animarElemento(c50); }
+                if (c75 && c75.textContent !== res.fecha75) { c75.textContent = res.fecha75; animarElemento(c75); }
+            }
+        }
+    };
+
+    // Cálculos de exámenes
     if (inputExamenes) {
         inputExamenes.addEventListener('input', () => {
             const total = parseInt(inputExamenes.value, 10);
@@ -178,42 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const actualizarTablasSuperiores = () => {
-        form.querySelectorAll('input[data-campo]').forEach(input => {
-            if (input.value.trim() !== '') {
-                const campoNombre = input.getAttribute('data-campo');
-                let valor = input.value.trim();
-                if (input.type === 'date' && valor.includes('-')) {
-                    const partes = valor.split('-');
-                    valor = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                }
-                const celdaDestino = document.querySelector(`.caja-scroll table [data-campo="${campoNombre}"]`);
-                if (celdaDestino && celdaDestino.textContent.trim() !== valor) {
-                    celdaDestino.textContent = valor;
-                    animarElemento(celdaDestino.tagName.toLowerCase() === 'a' ? celdaDestino.parentElement : celdaDestino);
-                }
-            }
-        });
-
-        const fIni = form.querySelector('input[data-campo="fechainicio"]').value;
-        const fFin = form.querySelector('input[data-campo="fechafin"]').value;
-        if (fIni && fFin) {
-            const res = calcularFechasPorcentajes(fIni, fFin);
-            if (res) {
-                const c50 = document.getElementById('fecha-50');
-                const c75 = document.getElementById('fecha-75');
-                if (c50 && c50.textContent !== res.fecha50) { c50.textContent = res.fecha50; animarElemento(c50); }
-                if (c75 && c75.textContent !== res.fecha75) { c75.textContent = res.fecha75; animarElemento(c75); }
-            }
-        }
-    };
-
-    // --- GUARDAR EN FIRESTORE AL ENVIAR FORMULARIO ---
+    // --- GUARDAR EN FIRESTORE MANUALMENTE (AL PULSAR EL BOTÓN) ---
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         mensajeError.style.display = 'none';
 
-        // 1. Validar ID Guía (No puede estar vacío)
         const idGuiaFinal = inputIdGuia.value.trim().toUpperCase();
         if (!idGuiaFinal) {
             mensajeError.textContent = "Error: Debes asignar un 'ID Guía' para poder guardar el curso.";
@@ -221,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 2. Validar fechas
         const fIni = form.querySelector('input[data-campo="fechainicio"]').value;
         const fFin = form.querySelector('input[data-campo="fechafin"]').value;
         if (fIni && fFin && new Date(fFin) < new Date(fIni)) {
@@ -230,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 3. Recopilar alumnos y VALIDAR EMAILS DUPLICADOS
+        // Recopilar alumnos y validar correos duplicados
         const listaAlumnos = [];
         const emailsVistos = new Set();
         let hayEmailDuplicado = false;
@@ -247,10 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (emailAlumno && emailAlumno !== 'escribe...' && emailAlumno !== '') {
                 if (emailsVistos.has(emailAlumno)) {
                     hayEmailDuplicado = true;
-                    mensajeError.textContent = `Error: El email "${emailAlumno}" está duplicado en la tabla de alumnos. Corrígelo antes de guardar.`;
+                    mensajeError.textContent = `Error: El email "${emailAlumno}" está repetido. Corrige el duplicado antes de guardar.`;
                     mensajeError.style.display = 'block';
-                    
-                    // Resaltar la fila problemática en rojo
                     fila.style.backgroundColor = '#fee2e2';
                     setTimeout(() => fila.style.backgroundColor = '', 4000);
                     break;
@@ -283,26 +368,26 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        if (hayEmailDuplicado) return; // Cortamos la ejecución, no se guarda.
+        if (hayEmailDuplicado) return;
 
-        actualizarTablasSuperiores();
+        window.actualizarTablasSuperiores();
 
-        // 4. Recopilar datos del formulario
         const datosFormulario = {};
         form.querySelectorAll('input[data-campo]').forEach(input => {
             datosFormulario[input.getAttribute('data-campo')] = input.value;
         });
 
-        // 5. Enviar a Firestore usando el ID del curso como clave única
         try {
-            const docCursoRef = doc(db, "cursos", idGuiaFinal);
-            await setDoc(docCursoRef, {
+            const docRef = doc(db, "cursos", normalizarIdDoc(idGuiaFinal));
+            await setDoc(docRef, {
                 curso: datosFormulario,
                 alumnos: listaAlumnos,
                 actualizadoEn: new Date().toISOString()
             });
 
-            cursoActualId = idGuiaFinal; // Actualizamos el ID actual
+            cursoActualId = idGuiaFinal;
+            localStorage.setItem('ultimoCursoActivo', idGuiaFinal);
+
             toast.classList.add("mostrar");
             setTimeout(() => toast.classList.remove("mostrar"), 3000);
         } catch (error) {
@@ -311,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Contador de alumnos
     const actualizarContadorAlumnos = () => {
         const contador = document.getElementById('contador-alumnos') || document.querySelector('.rango-paginacion');
         if (!contador || !tablaAlumnos) return;
@@ -319,8 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contador.textContent = totalVisibles === 0 ? '0' : `1 - ${totalVisibles}`;
     };
 
-    // Función constructora de fila
-    const crearFilaHTML = (num, datos = {}) => {
+    window.crearFilaHTML = (num, datos = {}) => {
         const tel = datos.tel || '';
         const email = datos.email || '';
         const hrefTel = tel.replace(/\D/g, '').length > 5 ? `https://wa.me/34${tel.replace(/\D/g, '')}` : '#';
@@ -367,9 +450,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const tbody = tablaAlumnos.querySelector('tbody');
             const nuevoNumero = tbody.querySelectorAll('tr').length + 1;
             const nuevaFila = document.createElement('tr');
-            nuevaFila.innerHTML = crearFilaHTML(nuevoNumero);
+            nuevaFila.innerHTML = window.crearFilaHTML(nuevoNumero);
             tbody.appendChild(nuevaFila);
             actualizarContadorAlumnos();
+            window.sincronizarTotales();
         });
     }
 
@@ -381,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Teléfono y email dinámicos
+    // Enlaces dinámicos
     tablaAlumnos.addEventListener('input', (e) => {
         const elemento = e.target;
         if (elemento.getAttribute('data-tipo') === 'tel') {
@@ -460,6 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (check) primerTd.appendChild(check);
         });
         actualizarContadorAlumnos();
+        window.sincronizarTotales();
     };
 
     document.getElementById('btn-eliminar-alumno')?.addEventListener('click', () => {
@@ -478,16 +563,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Cambio de color en Tipo Alumno
+    // Tipo Alumno color
     tablaAlumnos.addEventListener('change', (e) => {
         if (e.target.classList.contains('select-tipo-alumno')) {
             const celda = e.target.closest('td');
             celda.classList.toggle('col-estado-rezagado', e.target.value === 'REZAGADO');
             celda.classList.toggle('col-estado-finalizado', e.target.value === 'FINALIZADO');
+            window.sincronizarTotales();
         }
     });
 
-    // Buscador en tiempo real
+    // Buscador
     const inputBuscar = document.getElementById('buscador-alumnos') || document.querySelector('.caja-buscar input');
     if (inputBuscar) {
         inputBuscar.addEventListener('input', () => {
@@ -500,13 +586,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Desplegable acordeón
+    // Acordeón
     document.getElementById('btn-acordeon')?.addEventListener('click', function() {
         this.classList.toggle('abierto');
         document.getElementById('contenido-acordeon')?.classList.toggle('mostrar');
     });
 
-    // Descarga Excel CSV
+    // Exportar CSV
     document.getElementById('btn-descargar-excel')?.addEventListener('click', (e) => {
         e.preventDefault();
         const tablaCurso = document.querySelector('.caja-scroll table');
@@ -551,30 +637,40 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
     });
+});
 
-    // --- FUNCIÓN PARA CARGAR CURSO EN INTERFAZ ---
-    function cargarDatosEnInterfaz(data) {
-        if (!data) return;
+// 5. FUNCIÓN ASÍNCRONA PARA CARGAR DESDE FIRESTORE
+window.cargarDatosEnInterfaz = function(data) {
+    if (!data) return;
 
-        // Cargar formulario
-        if (data.curso) {
-            for (const [campo, valor] of Object.entries(data.curso)) {
-                const input = form.querySelector(`input[data-campo="${campo}"]`);
-                if (input) input.value = valor;
-            }
-            form.dispatchEvent(new Event('submit')); // Dispara actualización visual
+    const form = document.getElementById('form-edicion');
+
+    // 1. Cargar formulario
+    if (data.curso && form) {
+        for (const [campo, valor] of Object.entries(data.curso)) {
+            const input = form.querySelector(`input[data-campo="${campo}"]`);
+            if (input) input.value = valor;
         }
+        if (window.actualizarTablasSuperiores) {
+            window.actualizarTablasSuperiores();
+        }
+    }
 
-        // Reconstruir tabla
-        if (data.alumnos && Array.isArray(data.alumnos)) {
-            const tbody = document.querySelector('#tabla-alumnos tbody');
+    // 2. Reconstruir tabla de alumnos
+    if (data.alumnos && Array.isArray(data.alumnos)) {
+        const tbody = document.querySelector('#tabla-alumnos tbody');
+        if (tbody) {
             tbody.innerHTML = ''; 
             data.alumnos.forEach((alumno, index) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = crearFilaHTML(index + 1, alumno);
+                tr.innerHTML = window.crearFilaHTML(index + 1, alumno);
                 tbody.appendChild(tr);
             });
-            actualizarContadorAlumnos();
+            const contador = document.getElementById('contador-alumnos') || document.querySelector('.rango-paginacion');
+            if (contador) contador.textContent = `1 - ${data.alumnos.length}`;
+            
+            // Refrescar totales basados en la carga
+            if(window.sincronizarTotales) window.sincronizarTotales();
         }
     }
-});
+};
