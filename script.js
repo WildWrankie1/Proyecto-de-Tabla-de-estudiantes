@@ -1,7 +1,7 @@
 // 1. IMPORTACIONES A NIVEL SUPERIOR
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
 // 2. CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
@@ -17,12 +17,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Helper para convertir IDs con caracteres especiales en claves válidas para Firestore
 const normalizarIdDoc = (id) => encodeURIComponent(id.trim().toUpperCase());
 
 let cursoActualId = null;
 
-// Helper para destello visual de celdas actualizadas
 const animarElemento = (elemento) => {
     if (!elemento) return;
     elemento.classList.remove('celda-actualizada');
@@ -61,11 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById('form-edicion');
 
-    // --- PREVENIR GUARDADO ACCIDENTAL CON LA TECLA ENTER ---
+    // Prevenir guardado accidental con la tecla Enter
     form.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-            e.preventDefault(); // Evita que se envíe el formulario
-            e.target.blur();    // Quita el foco para que se dispare la búsqueda del ID
+            e.preventDefault();
+            e.target.blur();
         }
     });
 
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tablaAlumnos = document.getElementById('tabla-alumnos');
     const inputIdGuia = form.querySelector('input[data-campo="idguia"]');
 
-    // --- FUNCIÓN PARA SINCRONIZAR TABLA DE SEGUIMIENTO CON CUADROS SUPERIORES ---
+    // Sincronizar totales con la tabla superior
     window.sincronizarTotales = () => {
         if (!tablaAlumnos) return;
         
@@ -83,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let finalizados = 0;
         let rezagados = 0;
 
-        // Contar el estado solo de las filas que tienen datos reales
         filas.forEach(fila => {
             const c = fila.querySelectorAll('td');
             if (c.length < 19) return;
@@ -92,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = c[2].innerText.trim();
             const email = c[4].innerText.trim();
 
-            // Consideramos que la fila tiene a un "alumno real" si al menos tiene un dato de estos tres
             if (apellidos !== '' || nombre !== '' || (email !== '' && email !== 'escribe...')) {
                 totalReales++;
 
@@ -104,20 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 1. Actualizar los inputs del formulario
         const inputTotal = form.querySelector('input[data-campo="total"]');
         const inputAvanzados = form.querySelector('input[data-campo="avanzados"]');
         const inputRezagados = form.querySelector('input[data-campo="rezagados"]');
 
         if (inputTotal) {
             inputTotal.value = totalReales;
-            // Disparamos el evento para que recalcule automáticamente el "15% Desvío"
             inputTotal.dispatchEvent(new Event('input')); 
         }
         if (inputAvanzados) inputAvanzados.value = finalizados;
         if (inputRezagados) inputRezagados.value = rezagados;
 
-        // 2. Actualizar directamente la tabla visual superior (Cuadro 1)
         const celdaTotal = document.querySelector('.caja-scroll table [data-campo="total"]');
         const celdaAvanzados = document.querySelector('.caja-scroll table [data-campo="avanzados"]');
         const celdaRezagados = document.querySelector('.caja-scroll table [data-campo="rezagados"]');
@@ -127,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (celdaRezagados) celdaRezagados.textContent = rezagados;
     };
 
-    // --- LÓGICA DE RESETEO Y NUEVO CURSO ---
+    // Reseteo para nuevo curso
     const resetearFormularioYTabla = (mantenerId = false) => {
         const idActual = inputIdGuia ? inputIdGuia.value : '';
         form.reset();
@@ -168,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- BÚSQUEDA Y PREVENCIÓN DE SOBREESCRITURA ACCIDENTAL ---
+    // Búsqueda de cursos al salir del campo ID Guía
     if (inputIdGuia) {
         inputIdGuia.addEventListener('blur', async (e) => {
             const idBuscado = e.target.value.trim().toUpperCase();
@@ -189,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         e.target.value = cursoActualId || '';
                     }
                 } else {
-                    // Si el curso es nuevo y teníamos datos de otro en pantalla, reseteamos manteniendo el nuevo ID
                     if (cursoActualId && cursoActualId !== idBuscado) {
                         resetearFormularioYTabla(true);
                     }
@@ -221,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.querySelector('input[data-campo="alumnos_m25"]')
     ];
 
-    // Cálculos de fechas de corte 50% y 75%
     const calcularFechasPorcentajes = (inicioStr, finStr) => {
         if (!inicioStr || !finStr) return null;
         const [yI, mI, dI] = inicioStr.split('-').map(Number);
@@ -322,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- GUARDAR EN FIRESTORE MANUALMENTE ---
+    // Guardar en Firestore y auditar cambios
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         mensajeError.style.display = 'none';
@@ -334,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // CAPA DE SEGURIDAD EXTREMA: Evitar pisar cursos no cargados
         if (idGuiaFinal !== cursoActualId) {
             try {
                 const docRefTest = doc(db, "cursos", normalizarIdDoc(idGuiaFinal));
@@ -342,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (snapTest.exists()) {
                     mensajeError.textContent = `Error de seguridad: El curso "${idGuiaFinal}" ya existe. No puedes guardar un curso vacío encima. Haz clic fuera de la casilla del ID para cargarlo primero.`;
                     mensajeError.style.display = 'block';
-                    return; // ABORTAMOS EL GUARDADO
+                    return;
                 }
             } catch (err) {
                 console.error("Error validando duplicado", err);
@@ -358,10 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Validación de correos duplicados con resaltado prioritario en celdas
-        // ... (Aquí continúa el resto de tu código normal)
-
-        // Validación de correos duplicados con resaltado prioritario en celdas
         const listaAlumnos = [];
         const emailsVistos = new Set();
         let hayEmailDuplicado = false;
@@ -381,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     mensajeError.textContent = `Error: El email "${emailAlumno}" está repetido. Corrige el duplicado antes de guardar.`;
                     mensajeError.style.display = 'block';
                     
-                    // Resaltar celdas individualmente con !important para vencer a las clases CSS
                     c.forEach(td => td.style.setProperty('background-color', '#fee2e2', 'important'));
                     setTimeout(() => {
                         c.forEach(td => td.style.removeProperty('background-color'));
@@ -430,7 +415,18 @@ document.addEventListener('DOMContentLoaded', () => {
             await setDoc(docRef, {
                 curso: datosFormulario,
                 alumnos: listaAlumnos,
-                actualizadoEn: new Date().toISOString()
+                actualizadoEn: new Date().toISOString(),
+                modificadoPor: auth.currentUser?.email || "Desconocido"
+            });
+
+            // Registro en historial
+            const historialRef = collection(db, "cursos", normalizarIdDoc(idGuiaFinal), "historial");
+            await addDoc(historialRef, {
+                usuario: auth.currentUser?.email || "Desconocido",
+                fecha: new Date().toISOString(),
+                accion: "Edición / Guardado de curso",
+                totalAlumnos: listaAlumnos.length,
+                tutor: datosFormulario.tutor || "No asignado"
             });
 
             cursoActualId = idGuiaFinal;
@@ -451,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
         contador.textContent = totalVisibles === 0 ? '0' : `1 - ${totalVisibles}`;
     };
 
-    // Construcción de filas con enlaces condicionales limpios
     window.crearFilaHTML = (num, datos = {}) => {
         const tel = datos.tel || '';
         const email = datos.email || '';
@@ -515,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Enlaces reactivos en edición directa
+    // Enlaces reactivos
     tablaAlumnos.addEventListener('input', (e) => {
         const elemento = e.target;
         if (elemento.getAttribute('data-tipo') === 'tel') {
@@ -536,13 +531,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 elemento.removeAttribute('href');
             }
         }
-
         window.sincronizarTotales();
     });
 
     tablaAlumnos.addEventListener('click', (e) => {
         if (e.target.tagName === 'A' && e.target.getAttribute('contenteditable') === 'true') {
-            // Solo navegar si el enlace existe y se pulsa Ctrl
             if (!e.target.getAttribute('href') || !e.ctrlKey) {
                 e.preventDefault();
             }
@@ -628,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Cambio de estado en Tipo Alumno
+    // Tipo Alumno color
     tablaAlumnos.addEventListener('change', (e) => {
         if (e.target.classList.contains('select-tipo-alumno')) {
             const celda = e.target.closest('td');
@@ -702,6 +695,63 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
     });
+
+    // --- LÓGICA DE APERTURA Y CARGA DEL HISTORIAL ---
+    const btnVerHistorial = document.getElementById('btn-ver-historial');
+    const modalHistorial = document.getElementById('modal-historial');
+    const btnCerrarHistorial = document.getElementById('btn-cerrar-historial');
+    const listaHistorialBody = document.getElementById('lista-historial-body');
+    const modalHistorialTitulo = document.getElementById('modal-historial-titulo');
+
+    if (btnVerHistorial) {
+        btnVerHistorial.addEventListener('click', async () => {
+            const idGuiaFinal = inputIdGuia ? inputIdGuia.value.trim().toUpperCase() : '';
+            if (!idGuiaFinal) {
+                alert("Escribe o carga primero un 'ID Guía' para poder ver su historial.");
+                return;
+            }
+
+            modalHistorialTitulo.textContent = `HISTORIAL DE CAMBIOS - ${idGuiaFinal}`;
+            listaHistorialBody.innerHTML = '<tr><td colspan="4" style="padding: 20px;">Consultando base de datos...</td></tr>';
+            modalHistorial.classList.remove('oculto');
+
+            try {
+                const historialRef = collection(db, "cursos", normalizarIdDoc(idGuiaFinal), "historial");
+                const q = query(historialRef, orderBy("fecha", "desc"), limit(30));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    listaHistorialBody.innerHTML = '<tr><td colspan="4" style="padding: 20px; color: #666;">No hay modificaciones registradas para este curso todavía.</td></tr>';
+                    return;
+                }
+
+                listaHistorialBody.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const h = docSnap.data();
+                    const d = new Date(h.fecha);
+                    const fechaTxt = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fechaTxt}</td>
+                        <td style="font-weight: 600; color: #1e40af;">${h.usuario}</td>
+                        <td>${h.accion || 'Guardado'}</td>
+                        <td><span class="badge-alumnos">${h.totalAlumnos ?? 0}</span></td>
+                    `;
+                    listaHistorialBody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Error al obtener historial:", err);
+                listaHistorialBody.innerHTML = '<tr><td colspan="4" style="color: red; padding: 20px;">Error al consultar el historial en la base de datos.</td></tr>';
+            }
+        });
+    }
+
+    if (btnCerrarHistorial) {
+        btnCerrarHistorial.addEventListener('click', () => {
+            modalHistorial.classList.add('oculto');
+        });
+    }
 });
 
 // 5. CARGA PURA EN INTERFAZ
